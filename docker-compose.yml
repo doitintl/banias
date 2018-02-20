@@ -1,0 +1,12 @@
+version: "2"
+services:
+  collector:
+    build:
+      context: .
+      dockerfile: collector/Dockerfile
+    restart: always
+    volumes:
+    - .:/go/src/github.com/doitintl/banias
+    container_name: collector
+    ports:
+    - 8800:8081
