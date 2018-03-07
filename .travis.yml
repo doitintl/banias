@@ -1,7 +1,7 @@
 language: go
 
 env:
-  - DEP_VERSION=0.41
+  - DEP_VERSION=0.4.1
 
 go:
   - 1.10
