@@ -14,7 +14,7 @@ before_install:
 install:
   -  cd frontend && $GOPATH/bin/dep ensure
 
-script: pwd && ls -l &&  go build .
+script: go build .
 
 notifications:
   email: false
