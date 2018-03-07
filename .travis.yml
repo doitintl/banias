@@ -11,7 +11,7 @@ before_install:
   # Make the binary executable
   - chmod +x $GOPATH/bin/dep
 
-install: true
+install:
   -  cd frontend && $GOPATH/bin/dep ensure
 
 script: pwd && ls -l &&  go build .
