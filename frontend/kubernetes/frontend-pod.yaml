@@ -28,6 +28,50 @@ spec:
         configMapKeyRef:
           key: "BANIAS_DEBUG"
           name: "banias-frontend-config"
+    - name: "BANIAS_TOPIC"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_TOPIC"
+          name: "banias-frontend-config"
+    - name: "BANIAS_PORT"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_PORT"
+          name: "banias-frontend-config"
+    - name: "BANIAS_METRICSPORT"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_METRICSPORT"
+          name: "banias-frontend-config"
+    - name: "BANIAS_PUBSUBMAXBATCH"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_PUBSUBMAXBATCH"
+          name: "banias-frontend-config"
+    - name: "BANIAS_PUBSUBAGGRIGATORS"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_PUBSUBAGGRIGATORS"
+          name: "banias-frontend-config"
+    - name: "BANIAS_PUBSUBMAXPUBLISHDELAY"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_PUBSUBMAXPUBLISHDELAY"
+          name: "banias-frontend-config"
+    - name: "BANIAS_MAXPUBSUBGOROUTINESAMOUNT"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_MAXPUBSUBGOROUTINESAMOUNT"
+          name: "banias-frontend-config"
+    - name: "BANIAS_MAXPUBSUBGOROUTINEIDLEDURATION"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_MAXPUBSUBGOROUTINEIDLEDURATION"
+          name: "banias-frontend-config"
+
+
+
+
 
     - name: GOOGLE_APPLICATION_CREDENTIALS
       value: /var/secrets/google/key.json
