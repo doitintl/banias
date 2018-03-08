@@ -40,7 +40,7 @@ func main() {
 		atom,
 	))
 	defer logger.Sync()
-
+	logger.Info("Starting Banias....")
 	var err error
 	collector, err = cltr.NewCollector(logger, config)
 	if err != nil {

@@ -34,6 +34,7 @@ type Config struct {
 func setConfigDefaults() {
 	//TODO change debug to false
 	viper.SetDefault("Topic", "banias")
+	// TODO change to false
 	viper.SetDefault("Debug", false)
 	viper.SetDefault("Port", 8081)
 	viper.SetDefault("MetricsPort", 8080)

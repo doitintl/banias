@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: banias-frontend-service
+  labels:
+    name: banias-frontend-pod
+    tier: frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    name: banias-frontend-pod
+

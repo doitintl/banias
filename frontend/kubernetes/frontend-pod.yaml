@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: banias-frontend-pod
+  labels:
+    name: banias-frontend-pod
+spec:
+  volumes:
+  - name: google-cloud-key
+    secret:
+      secretName: pubsub-key
+  containers:
+  - name: "banias-frontend"
+    image: "gcr.io/aviv-playground/banias-frontend:test"
+    volumeMounts:
+    - name: google-cloud-key
+      mountPath: /var/secrets/google
+    ports:
+    - containerPort: 8081
+    env:
+    - name: "BANIAS_PROJECTID"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_PROJECTID"
+          name: "banias-frontend-config"
+    - name: "BANIAS_DEBUG"
+      valueFrom:
+        configMapKeyRef:
+          key: "BANIAS_DEBUG"
+          name: "banias-frontend-config"
+
+    - name: GOOGLE_APPLICATION_CREDENTIALS
+      value: /var/secrets/google/key.json
+    # TODO This setting makes nodes pull the docker image every time before
+            # starting the pod. This is useful when debugging, but should be turned
+            # off in production.
+    imagePullPolicy: Always

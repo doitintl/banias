@@ -50,33 +50,37 @@ type Publisher struct {
 	id            int
 }
 
-func createTopicIfNotExists(projectid string, topic string) (*gpubsub.Topic, error) {
+func createTopicIfNotExists(projectid string, topic string, logger *zap.Logger) (*gpubsub.Topic, error) {
 	ctx := context.Background()
 	client, err := gpubsub.NewClient(ctx, projectid)
 	if err != nil {
+		logger.Error("Pub/Sub client creation error", zap.Error(err))
 		return nil, err
 	}
-
 	// Create a topic to subscribe to.
 	t := client.Topic(topic)
 	ok, err := t.Exists(ctx)
 	if err != nil {
+		logger.Error("Pub/Sub topic exists error", zap.Error(err))
 		return t, err
 	}
 	if ok {
+		logger.Info("Topic exists we are all good!")
 		return t, err
 	}
-
 	t, err = client.CreateTopic(ctx, topic)
 	if err != nil {
 		return t, err
 	}
+	logger.Info("New topic created")
 	return t, err
 }
 
 func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, id int) (*Publisher, error) {
+	logger.Debug("Creating a new publisher", zap.Int("id", id))
 	gp := pool.NewGoPool(config.MaxPubSubGoroutinesAmount, config.MaxPubSubGoroutineIdleDuration)
-	topic, err := createTopicIfNotExists(config.ProjectID, config.Topic)
+	topic, err := createTopicIfNotExists(config.ProjectID, config.Topic, logger)
+	logger.Debug("Done with topic")
 	p := Publisher{
 		bqEvents: bqEvents,
 		logger:   logger,
@@ -86,9 +90,11 @@ func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cf
 		wg:       new(sync.WaitGroup),
 		id:       id,
 	}
+	logger.Debug("Done with publisher struct!")
 	if err != nil {
 		logger.Error("Error creating topic", zap.Error(err))
 	}
+	logger.Debug("Done with NewPublisher")
 	return &p, err
 }
 
@@ -130,7 +136,7 @@ func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay 
 }
 
 func (c *Publisher) Run() {
-
+	c.logger.Debug("Starting Run")
 	messages := make([]gpubsub.Message, 0, c.config.PubsubMaxBatch)
 	t := time.NewTimer(c.config.PubsubMaxPublishDelay)
 	for {

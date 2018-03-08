@@ -45,7 +45,7 @@ type Collector struct {
 }
 
 func NewCollector(logger *zap.Logger, config *cfg.Config) (*Collector, error) {
-	bqEvents := make(chan types.EventMsg, config.MaxPubSubGoroutinesAmount*config.PubsubMaxBatch)
+	bqEvents := make(chan types.EventMsg, config.MaxPubSubGoroutinesAmount*config.PubsubMaxBatch*config.PubSubAggrigators)
 	c := Collector{
 		bqEvents: bqEvents,
 		logger:   logger,
@@ -56,6 +56,7 @@ func NewCollector(logger *zap.Logger, config *cfg.Config) (*Collector, error) {
 		if err == nil {
 			go pub.Run()
 		} else {
+			logger.Error("Error crating a publisher",zap.Error(err))
 			return &c, err
 		}
 
