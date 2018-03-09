@@ -65,20 +65,18 @@ func createTopicIfNotExists(projectid string, topic string, logger *zap.Logger) 
 		return t, err
 	}
 	if ok {
-		logger.Info("Topic exists we are all good!")
 		return t, err
 	}
 	t, err = client.CreateTopic(ctx, topic)
 	if err != nil {
 		return t, err
 	}
-	logger.Info("New topic created")
 	return t, err
 }
 
 func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, id int) (*Publisher, error) {
 	logger.Debug("Creating a new publisher", zap.Int("id", id))
-	gp := pool.NewGoPool(config.MaxPubSubGoroutinesAmount, config.MaxPubSubGoroutineIdleDuration)
+	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount ), config.MaxPubSubGoroutineIdleDuration)
 	topic, err := createTopicIfNotExists(config.ProjectID, config.Topic, logger)
 	logger.Debug("Done with topic")
 	p := Publisher{
@@ -128,7 +126,7 @@ func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay 
 		messages = nil
 		promLabels := prometheus.Labels{"function": "Publish"}
 		publishCounter.With(promLabels).Add(float64(total))
-		c.logger.Info("Published ", zap.Int64("Success", total-errnum), zap.Int64("Failures", errnum))
+		c.logger.Debug("Published ", zap.Int64("Success", total-errnum), zap.Int64("Failures", errnum))
 		t.Reset(maxDelay)
 		c.wg.Done()
 	})

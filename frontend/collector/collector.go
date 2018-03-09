@@ -45,7 +45,7 @@ type Collector struct {
 }
 
 func NewCollector(logger *zap.Logger, config *cfg.Config) (*Collector, error) {
-	bqEvents := make(chan types.EventMsg, config.MaxPubSubGoroutinesAmount*config.PubsubMaxBatch*config.PubSubAggrigators)
+	bqEvents := make(chan types.EventMsg, int ((config.MaxPubSubGoroutinesAmount*config.PubsubMaxBatch*config.PubSubAggrigators)/config.PubSubAggrigators))
 	c := Collector{
 		bqEvents: bqEvents,
 		logger:   logger,

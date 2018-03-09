@@ -16,6 +16,9 @@ import (
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+//	_ "net/http/pprof"
+
+
 )
 
 
@@ -25,7 +28,10 @@ var httpAddr string
 var collector *cltr.Collector
 
 func main() {
-
+	// TODO remove when done profiling
+//	go func() {
+//		http.ListenAndServe("localhost:6060", nil)
+//	}()
 	config, _ = cfg.NewConfig()
 	httpAddr = ":" + strconv.Itoa(config.Port)
 	metricsAddr = ":" + strconv.Itoa(config.MetricsPort)

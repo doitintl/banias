@@ -39,7 +39,7 @@ func setConfigDefaults() {
 	viper.SetDefault("Port", 8081)
 	viper.SetDefault("MetricsPort", 8080)
 	viper.SetDefault("PubsubMaxBatch", 1000)
-	viper.SetDefault("PubSubAggrigators", 30)
+	viper.SetDefault("PubSubAggrigators", 30	)
 	viper.SetDefault("PubsubMaxPublishDelay", 5)
 	viper.SetDefault("MaxPubSubGoroutinesAmount", 256*1024)
 	viper.SetDefault("MaxPubSubGoroutineIdleDuration", 10)
