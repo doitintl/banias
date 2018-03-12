@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: banias-frontend-deplyoment
+  name: banias-frontend
   labels:
      app: banias-frontend
 spec:
-  replicas: 3
+  replicas: 4
   selector:
     matchLabels:
         app: banias-frontend
@@ -15,6 +15,8 @@ spec:
           app: banias-frontend
 
       spec:
+        nodeSelector:
+          only: me
         containers:
         - name: "banias-frontend"
           image: "gcr.io/aviv-playground/banias-frontend:test"
@@ -76,10 +78,6 @@ spec:
                 name: "banias-frontend-config"
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
-          # TODO This setting makes nodes pull the docker image every time before
-                  # starting the pod. This is useful when debugging, but should be turned
-                  # off in production.
-          imagePullPolicy: Always
         volumes:
           - name: google-cloud-key
             secret:

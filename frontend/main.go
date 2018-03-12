@@ -16,11 +16,9 @@ import (
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-//	_ "net/http/pprof"
-
-
+	//	_ "net/http/pprof"
+	"github.com/stackimpact/stackimpact-go"
 )
-
 
 var config *cfg.Config
 var metricsAddr string
@@ -29,9 +27,13 @@ var collector *cltr.Collector
 
 func main() {
 	// TODO remove when done profiling
-//	go func() {
-//		http.ListenAndServe("localhost:6060", nil)
-//	}()
+	//	go func() {
+	//		http.ListenAndServe("localhost:6060", nil)
+	//	}()
+	stackimpact.Start(stackimpact.Options{
+		
+		AppName:  "Banias",
+	})
 	config, _ = cfg.NewConfig()
 	httpAddr = ":" + strconv.Itoa(config.Port)
 	metricsAddr = ":" + strconv.Itoa(config.MetricsPort)
@@ -63,10 +65,6 @@ func main() {
 }
 
 func initHttpHandler(g *group.Group, logger *zap.Logger) {
-	httpListener, err := net.Listen("tcp", httpAddr)
-	if err != nil {
-		logger.Error("Error", zap.String("transport", "HTTP"), zap.String("during", "Listen"), zap.Error(err))
-	}
 	requestHandler := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
 		case "/track":
@@ -77,9 +75,9 @@ func initHttpHandler(g *group.Group, logger *zap.Logger) {
 	}
 	g.Add(func() error {
 		logger.Info("HTTP Server", zap.String("transport", "HTTP"), zap.String("addr", httpAddr))
-		return fasthttp.Serve(httpListener, requestHandler)
+		return fasthttp.ListenAndServe(httpAddr, requestHandler)
 	}, func(error) {
-		httpListener.Close()
+		logger.Error("Error start serving")
 	})
 
 }
@@ -104,6 +102,7 @@ func initCancelInterrupt(g *group.Group) {
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 		select {
 		case sig := <-c:
+			collector.Stop()
 			return fmt.Errorf("received signal %s", sig)
 		case <-cancelInterrupt:
 			return nil

@@ -9,7 +9,6 @@ import (
 	cfg "github.com/doitintl/banias/frontend/config"
 	"github.com/doitintl/banias/frontend/types"
 	"github.com/henrylee2cn/goutil/pool"
-	"github.com/pquerna/ffjson/ffjson"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 )
@@ -31,7 +30,14 @@ var (
 	}, promLabelNames)
 )
 
+var msgPool *sync.Pool
+
 func init() {
+	msgPool = &sync.Pool{
+		New: func() interface{} {
+			return new(gpubsub.Message)
+		},
+	}
 
 	prometheus.MustRegister(publishCounter)
 	prometheus.MustRegister(publishTimeSummary)
@@ -40,6 +46,7 @@ func init() {
 
 type Publisher struct {
 	bqEvents      <-chan types.EventMsg
+	doneChan 	 <-chan bool
 	logger        *zap.Logger
 	gp            *pool.GoPool
 	gpubsubClient gpubsub.Client
@@ -50,13 +57,13 @@ type Publisher struct {
 	id            int
 }
 
-func createTopicIfNotExists(projectid string, topic string, logger *zap.Logger) (*gpubsub.Topic, error) {
+func GetClient(projectid string)(*gpubsub.Client, error){
 	ctx := context.Background()
 	client, err := gpubsub.NewClient(ctx, projectid)
-	if err != nil {
-		logger.Error("Pub/Sub client creation error", zap.Error(err))
-		return nil, err
-	}
+	return client, err
+}
+func createTopicIfNotExists(projectid string, topic string, logger *zap.Logger, client *gpubsub.Client) (*gpubsub.Topic, error) {
+	ctx := context.Background()
 	// Create a topic to subscribe to.
 	t := client.Topic(topic)
 	ok, err := t.Exists(ctx)
@@ -74,10 +81,10 @@ func createTopicIfNotExists(projectid string, topic string, logger *zap.Logger) 
 	return t, err
 }
 
-func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, id int) (*Publisher, error) {
+func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, client *gpubsub.Client, id int) (*Publisher, error) {
 	logger.Debug("Creating a new publisher", zap.Int("id", id))
-	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount ), config.MaxPubSubGoroutineIdleDuration)
-	topic, err := createTopicIfNotExists(config.ProjectID, config.Topic, logger)
+	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount), config.MaxPubSubGoroutineIdleDuration)
+	topic, err := createTopicIfNotExists(config.ProjectID, config.Topic, logger, client)
 	logger.Debug("Done with topic")
 	p := Publisher{
 		bqEvents: bqEvents,
@@ -88,7 +95,6 @@ func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cf
 		wg:       new(sync.WaitGroup),
 		id:       id,
 	}
-	logger.Debug("Done with publisher struct!")
 	if err != nil {
 		logger.Error("Error creating topic", zap.Error(err))
 	}
@@ -97,15 +103,9 @@ func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cf
 }
 
 func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay time.Duration, ) {
+	now := time.Now()
 	c.wg.Add(1)
 	c.gp.Go(func() {
-		defer func(begin time.Time) {
-			promLabels := prometheus.Labels{"function": "Publish"}
-			responseTime := time.Since(begin).Seconds() * 1000
-			publishTimeSummary.With(promLabels).Observe(responseTime)
-
-		}(time.Now())
-
 		var total int64 = 0
 		var errnum int64 = 0
 		ctx := context.Background()
@@ -122,9 +122,10 @@ func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay 
 				errnum++
 			}
 		}
-
 		messages = nil
 		promLabels := prometheus.Labels{"function": "Publish"}
+		responseTime := time.Since(now).Seconds() * 1000
+		publishTimeSummary.With(promLabels).Observe(responseTime)
 		publishCounter.With(promLabels).Add(float64(total))
 		c.logger.Debug("Published ", zap.Int64("Success", total-errnum), zap.Int64("Failures", errnum))
 		t.Reset(maxDelay)
@@ -134,6 +135,7 @@ func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay 
 }
 
 func (c *Publisher) Run() {
+
 	c.logger.Debug("Starting Run")
 	messages := make([]gpubsub.Message, 0, c.config.PubsubMaxBatch)
 	t := time.NewTimer(c.config.PubsubMaxPublishDelay)
@@ -148,25 +150,35 @@ func (c *Publisher) Run() {
 			c.logger.Debug("Calling publish due to time", zap.Int("Number of message", len(messages)), zap.Int("Aggrigator ID", c.id))
 			c.Publish(messages, t, c.config.PubsubMaxPublishDelay)
 			messages = nil
-
-
-
 		case event := <-c.bqEvents:
-
-			buf, err := ffjson.Marshal(event)
+			buf, err := event.MarshalJSON()
 			if err != nil {
 				c.logger.Error("Error Marshaling event", zap.Error(err))
 				continue
 			}
-			messages = append(messages, gpubsub.Message{Data: buf})
+			m := msgPool.Get().(*gpubsub.Message)
+			m.Data = buf
+			messages = append(messages, *m)
+			msgPool.Put(m)
 			if len(messages) == c.config.PubsubMaxBatch {
 
 				c.logger.Debug("Calling publish due to capacity ", zap.Int("Number of message", len(messages)), zap.Int("Aggrigator ID", c.id))
 				c.Publish(messages, t, c.config.PubsubMaxPublishDelay)
 				messages = nil
-
 			}
+		case <-c.doneChan:
+			c.Stop()
+			c.logger.Info("Got a done signal")
+			break
 		}
 	}
+
+}
+
+func (c *Publisher) Stop() {
+	c.logger.Info("Stopping topic publish")
+	c.topic.Stop()
+	c.logger.Info("Stopping worker pool")
+	c.gp.Stop()
 
 }

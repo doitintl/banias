@@ -231,9 +231,6 @@
     "plugin/ocgrpc",
     "plugin/ocgrpc/grpcstats",
     "plugin/ocgrpc/grpctrace",
-    "plugin/ochttp",
-    "plugin/ochttp/propagation/b3",
-    "plugin/ochttp/propagation/google",
     "stats",
     "stats/internal",
     "stats/view",
@@ -345,7 +342,6 @@
     "transport/grpc",
     "transport/http"
   ]
-  # TODO foxthis ocgrpc.ClientHandler
   revision = "afa8e6afb8175363fc9ede3d2978a36a4e4e7c77"
 
 [[projects]]

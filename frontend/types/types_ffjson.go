@@ -291,19 +291,15 @@ func (j *Event) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	var obj []byte
 	_ = obj
 	_ = err
-	if j.TypeField != nil {
-		buf.WriteString(`{"type":`)
+	buf.WriteString(`{"type":`)
 
-		{
+	{
 
-			err = j.TypeField.MarshalJSONBuf(buf)
-			if err != nil {
-				return err
-			}
-
+		err = j.TypeField.MarshalJSONBuf(buf)
+		if err != nil {
+			return err
 		}
-	} else {
-		buf.WriteString(`{"type":null`)
+
 	}
 	buf.WriteString(`,"payload":`)
 	/* Falling back. type=types.Payload kind=map */
@@ -463,13 +459,7 @@ handle_TypeField:
 	{
 		if tok == fflib.FFTok_null {
 
-			j.TypeField = nil
-
 		} else {
-
-			if j.TypeField == nil {
-				j.TypeField = new(Type)
-			}
 
 			err = j.TypeField.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
 			if err != nil {

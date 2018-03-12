@@ -20,7 +20,7 @@ type TrackRequest struct {
 }
 
 type Event struct {
-	TypeField    *Type   `json:"type"`
+	TypeField    Type   `json:"type"`
 	PayloadField Payload `json:"payload" valid:"-"`
 }
 

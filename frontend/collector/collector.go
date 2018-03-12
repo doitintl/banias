@@ -3,6 +3,7 @@ package collector
 import (
 	"encoding/json"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/buger/jsonparser"
@@ -12,6 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
+	"github.com/henrylee2cn/goutil/pool"
 )
 
 var (
@@ -31,7 +33,18 @@ var (
 	}, promLabelNames)
 )
 
+var (
+	strContentType     = []byte("Content-Type")
+	strApplicationJSON = []byte("application/json")
+	msgPool            *sync.Pool
+)
+
 func init() {
+	msgPool = &sync.Pool{
+		New: func() interface{} {
+			return new(types.EventMsg)
+		},
+	}
 
 	prometheus.MustRegister(requestCounter)
 	prometheus.MustRegister(responseTimeSummary)
@@ -40,27 +53,37 @@ func init() {
 
 type Collector struct {
 	bqEvents chan<- types.EventMsg
+	doneChan chan<- bool
 	logger   *zap.Logger
 	config   *cfg.Config
+	gp            *pool.GoPool
 }
 
 func NewCollector(logger *zap.Logger, config *cfg.Config) (*Collector, error) {
-	bqEvents := make(chan types.EventMsg, int ((config.MaxPubSubGoroutinesAmount*config.PubsubMaxBatch*config.PubSubAggrigators)/config.PubSubAggrigators))
+	bqEvents := make(chan types.EventMsg, int(config.PubsubMaxBatch*config.PubSubAggrigators))
+	doneChan := make(chan bool)
+	gp := pool.NewGoPool(int(config.PubSubAggrigators), config.MaxPubSubGoroutineIdleDuration)
 	c := Collector{
 		bqEvents: bqEvents,
+		doneChan: doneChan,
 		logger:   logger,
 		config:   config,
+		gp :gp,
 	}
+
+
 	for i := 0; i < config.PubSubAggrigators; i++ {
-		pub, err := publisher.NewPublisher(logger, bqEvents, config, i)
+	client, err := publisher.GetClient(config.ProjectID)
+		pub, err := publisher.NewPublisher(logger, bqEvents, config, client, i)
 		if err == nil {
-			go pub.Run()
+			c.gp.Go(pub.Run)
 		} else {
-			logger.Error("Error crating a publisher",zap.Error(err))
+			logger.Error("Error crating a publisher", zap.Error(err))
 			return &c, err
 		}
 
 	}
+
 	return &c, nil
 }
 
@@ -90,27 +113,24 @@ func (c *Collector) Collect(ctx *fasthttp.RequestCtx) {
 			[]string{"type", "event_name"},
 			[]string{"payload"},
 		}
-		var (
-			eventType types.Type
-			event     types.Event
-			msg       types.EventMsg
-		)
+		msg := msgPool.Get().(*types.EventMsg)
 		i++
 		counter := 0
 		jsonparser.EachKey(events, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
 			switch idx {
 			case 0:
 				t, _ := jsonparser.ParseString(value)
-				eventType.EventVersionField = t
+				msg.Event.TypeField.EventVersionField = t
 				counter = counter + 1
 			case 1:
 				t, _ := jsonparser.ParseString(value)
-				eventType.EventNameField = t
+				msg.Event.TypeField.EventNameField = t
 				counter = counter + 2
 			case 2:
 				counter = counter + 4
 				t, _, _, _ := jsonparser.Get(value)
-				err = json.Unmarshal([]byte(t), &event.PayloadField)
+				err = json.Unmarshal([]byte(t), msg.Event.PayloadField)
+
 			}
 		}, paths...)
 		if counter != 7 {
@@ -136,20 +156,22 @@ func (c *Collector) Collect(ctx *fasthttp.RequestCtx) {
 			errors = append(errors, *eventErr)
 
 		} else {
-			event.TypeField = &eventType
-			msg.Event = event
 			msg.SenderID = senderID
-			c.bqEvents <- msg
+			c.bqEvents <- *msg
 
 		}
+		msgPool.Put(msg)
 
 	}, "events")
-	var (
-		strContentType     = []byte("Content-Type")
-		strApplicationJSON = []byte("application/json")
-	)
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
 	ctx.Response.SetStatusCode(202)
 	json.NewEncoder(ctx).Encode(errors)
 
+}
+
+func (c *Collector) Stop() {
+	c.gp.Stop()
+	go func() {
+		c.doneChan <- true
+	}()
 }

@@ -1,0 +1,14 @@
+apiVersion: skaffold/v1
+kind: Config
+build:
+  artifacts:
+  - imageName: gcr.io/aviv-playground/banias-frontend
+    workspace: .
+  local: {}
+deploy:
+  kubectl:
+    manifests:
+    - paths:
+      - deploy/*
+      parameters:
+        IMAGE_NAME: gcr.io/aviv-playground/banias-frontend
