@@ -139,7 +139,6 @@
   branch = "master"
   name = "github.com/pquerna/ffjson"
   packages = [
-    "ffjson",
     "fflib/v1",
     "fflib/v1/internal"
   ]
@@ -415,6 +414,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e6891850751fa354fcc2d223f21e82d0660a2f317c2f508095bcb8049daeec41"
+  inputs-digest = "285e7dd616b38ab5b7e1466b0565fff4bb974a753c82771580c343442a0219f0"
   solver-name = "gps-cdcl"
   solver-version = 1

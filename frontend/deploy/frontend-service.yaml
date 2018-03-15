@@ -3,12 +3,11 @@ kind: Service
 metadata:
   name: banias-frontend
   labels:
-    name: banias-frontend
-    tier: frontend
+    app: banias-frontend
 spec:
   type: LoadBalancer
   ports:
-  - port: 8080
+  - port: 80
     protocol: TCP
     targetPort: 8081
   selector:

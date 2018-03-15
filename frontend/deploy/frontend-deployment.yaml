@@ -2,10 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: banias-frontend
-  labels:
-     app: banias-frontend
 spec:
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
         app: banias-frontend
@@ -13,10 +11,52 @@ spec:
       metadata:
         labels:
           app: banias-frontend
-
+          k8s-app: banias-frontend
       spec:
-        nodeSelector:
-          only: me
+        initContainers:
+        - name: init-sysctl
+          image: busybox
+          command:
+          - /bin/sh
+          - -c
+          - |
+            sysctl -w net.ipv4.ip_forward=0
+            sysctl -w net.ipv4.conf.default.rp_filter=1
+            sysctl -w net.ipv4.conf.default.accept_source_route=0
+            sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=1
+            sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=1
+            sysctl -w kernel.msgmnb=65536
+            sysctl -w kernel.msgmax=65536
+            sysctl -w kernel.shmmax=68719476736
+            sysctl -w kernel.shmall=4294967296
+            sysctl -w net.core.somaxconn=50000
+            sysctl -w fs.file-max=100000
+            sysctl -w net.ipv4.tcp_syncookies=1
+            sysctl -w net.ipv4.conf.all.log_martians=0
+            sysctl -w net.core.somaxconn=50000
+            sysctl -w net.ipv4.tcp_max_syn_backlog=30000
+            sysctl -w net.ipv4.conf.all.send_redirects=0
+            sysctl -w net.ipv4.conf.all.accept_redirects=0
+            sysctl -w net.ipv4.conf.all.accept_source_route=0
+            sysctl -w net.ipv6.conf.all.forwarding=0
+            sysctl -w net.ipv4.tcp_slow_start_after_idle=0
+            sysctl -w net.ipv4.tcp_window_scaling=1
+            sysctl -w net.ipv4.tcp_timestamp=1
+            sysctl -w net.ipv4.tcp_sack=1
+            sysctl -w net.ipv4.tcp_congestion_control=htcp
+            sysctl -w net.ipv4.tcp_keepalive_time=60
+            sysctl -w net.netfilter.nf_conntrack_tcp_timeout_time_wait=10
+            sysctl -w net.netfilter.nf_conntrack_tcp_timeout_established=300
+            sysctl -w net.netfilter.nf_conntrack_generic_timeout=300
+            sysctl -w net.ipv4.tcp_max_tw_buckets=2000000
+            sysctl -w net.ipv4.tcp_fin_timeout=10
+            sysctl -w net.ipv4.tcp_tw_reuse=1
+            sysctl -w net.ipv4.tcp_keepalive_intvl=15
+            sysctl -w net.ipv4.tcp_keepalive_probes=5
+
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
         containers:
         - name: "banias-frontend"
           image: "gcr.io/aviv-playground/banias-frontend:test"
@@ -24,7 +64,10 @@ spec:
           - name: google-cloud-key
             mountPath: /var/secrets/google
           ports:
-          - containerPort: 8081
+          - name: http
+            containerPort: 8081
+          - name: prom-metrics
+            containerPort: 8080
           env:
           - name: "BANIAS_PROJECTID"
             valueFrom:
@@ -82,3 +125,4 @@ spec:
           - name: google-cloud-key
             secret:
               secretName: pubsub-key
+

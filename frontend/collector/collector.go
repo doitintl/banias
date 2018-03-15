@@ -37,6 +37,12 @@ var (
 	strContentType     = []byte("Content-Type")
 	strApplicationJSON = []byte("application/json")
 	msgPool            *sync.Pool
+	paths = [][]string{
+		[]string{"type", "event_version"},
+		[]string{"type", "event_name"},
+		[]string{"payload"},
+	}
+
 )
 
 func init() {
@@ -108,11 +114,6 @@ func (c *Collector) Collect(ctx *fasthttp.RequestCtx) {
 	i := 0
 	jsonparser.ArrayEach(data, func(events []byte, dataType jsonparser.ValueType, offset int, err error) {
 
-		paths := [][]string{
-			[]string{"type", "event_version"},
-			[]string{"type", "event_name"},
-			[]string{"payload"},
-		}
 		msg := msgPool.Get().(*types.EventMsg)
 		i++
 		counter := 0
