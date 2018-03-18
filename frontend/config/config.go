@@ -25,21 +25,21 @@ type Config struct {
 	PubSubAggrigators int
 	// Max time to pass in seconds before publishing.
 	PubsubMaxPublishDelay time.Duration
-	//The default maximum amount of goroutines for publishing.
+	// The default maximum amount of goroutines for publishing.
 	MaxPubSubGoroutinesAmount int
-	//The default maximum idle duration of a goroutine.
+	// The default maximum idle duration of a goroutine.
 	MaxPubSubGoroutineIdleDuration time.Duration
 }
 
 func setConfigDefaults() {
-	//TODO change debug to false
+	// TODO change debug to false
 	viper.SetDefault("Topic", "banias")
 	// TODO change to false
 	viper.SetDefault("Debug", false)
 	viper.SetDefault("Port", 8081)
 	viper.SetDefault("MetricsPort", 8080)
 	viper.SetDefault("PubsubMaxBatch", 1000)
-	viper.SetDefault("PubSubAggrigators", 30	)
+	viper.SetDefault("PubSubAggrigators", 30)
 	viper.SetDefault("PubsubMaxPublishDelay", 5)
 	viper.SetDefault("MaxPubSubGoroutinesAmount", 256*1024)
 	viper.SetDefault("MaxPubSubGoroutineIdleDuration", 10)

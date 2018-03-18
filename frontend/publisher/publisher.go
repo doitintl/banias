@@ -9,25 +9,15 @@ import (
 	cfg "github.com/doitintl/banias/frontend/config"
 	"github.com/doitintl/banias/frontend/types"
 	"github.com/henrylee2cn/goutil/pool"
-	"github.com/prometheus/client_golang/prometheus"
+	"go.opencensus.io/stats"
+	"go.opencensus.io/stats/view"
+	"go.opencensus.io/tag"
 	"go.uber.org/zap"
 )
 
 var (
-	promLabelNames = []string{"function"}
-	publishCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts(prometheus.Opts{
-			Namespace: "banias",
-			Subsystem: "publisher",
-			Name:      "pubsub_publish_total",
-			Help:      "pubsub publish total",
-		}), promLabelNames)
-	publishTimeSummary = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Namespace: "banias",
-		Subsystem: "publisher",
-		Name:      "pubsub_publish_duration_milliseconds",
-		Help:      "pubsub publish duration (ms)",
-	}, promLabelNames)
+	publisherCounter *stats.Float64Measure
+	successKey       tag.Key
 )
 
 var msgPool *sync.Pool
@@ -39,14 +29,23 @@ func init() {
 		},
 	}
 
-	prometheus.MustRegister(publishCounter)
-	prometheus.MustRegister(publishTimeSummary)
+	successKey, _ = tag.NewKey("banias/keys/code")
+	publisherCounter, _ = stats.Float64("banias/measures/published_count", "Count of pub sub published messages", stats.UnitNone)
+	view.Subscribe(
+		&view.View{
+			Name:        "publish_count",
+			Description: "Count of pub sub published messages",
+			TagKeys:     []tag.Key{successKey},
+			Measure:     publisherCounter,
+			Aggregation: view.SumAggregation{},
+		})
+	view.SetReportingPeriod(1 * time.Second)
 
 }
 
 type Publisher struct {
 	bqEvents      <-chan types.EventMsg
-	doneChan 	 <-chan bool
+	doneChan      <-chan bool
 	logger        *zap.Logger
 	gp            *pool.GoPool
 	gpubsubClient gpubsub.Client
@@ -57,12 +56,12 @@ type Publisher struct {
 	id            int
 }
 
-func GetClient(projectid string)(*gpubsub.Client, error){
+func GetClient(projectid string) (*gpubsub.Client, error) {
 	ctx := context.Background()
 	client, err := gpubsub.NewClient(ctx, projectid)
 	return client, err
 }
-func createTopicIfNotExists(projectid string, topic string, logger *zap.Logger, client *gpubsub.Client) (*gpubsub.Topic, error) {
+func createTopicIfNotExists(topic string, logger *zap.Logger, client *gpubsub.Client) (*gpubsub.Topic, error) {
 	ctx := context.Background()
 	// Create a topic to subscribe to.
 	t := client.Topic(topic)
@@ -84,7 +83,7 @@ func createTopicIfNotExists(projectid string, topic string, logger *zap.Logger, 
 func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, client *gpubsub.Client, id int) (*Publisher, error) {
 	logger.Debug("Creating a new publisher", zap.Int("id", id))
 	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount), config.MaxPubSubGoroutineIdleDuration)
-	topic, err := createTopicIfNotExists(config.ProjectID, config.Topic, logger, client)
+	topic, err := createTopicIfNotExists(config.Topic, logger, client)
 	logger.Debug("Done with topic")
 	p := Publisher{
 		bqEvents: bqEvents,
@@ -102,8 +101,7 @@ func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cf
 	return &p, err
 }
 
-func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay time.Duration, ) {
-	now := time.Now()
+func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay time.Duration) {
 	c.wg.Add(1)
 	c.gp.Go(func() {
 		var total int64 = 0
@@ -123,10 +121,10 @@ func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay 
 			}
 		}
 		messages = nil
-		promLabels := prometheus.Labels{"function": "Publish"}
-		responseTime := time.Since(now).Seconds() * 1000
-		publishTimeSummary.With(promLabels).Observe(responseTime)
-		publishCounter.With(promLabels).Add(float64(total))
+		ocCtx, _ := tag.New(ctx, tag.Insert(successKey, "Success"), )
+		stats.Record(ocCtx, publisherCounter.M(float64(total-errnum)))
+		ocCtx, _ = tag.New(ctx, tag.Insert(successKey, "Failures"), )
+		stats.Record(ocCtx, publisherCounter.M(float64(errnum)))
 		c.logger.Debug("Published ", zap.Int64("Success", total-errnum), zap.Int64("Failures", errnum))
 		t.Reset(maxDelay)
 		c.wg.Done()

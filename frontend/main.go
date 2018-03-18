@@ -1,4 +1,4 @@
- package main
+package main
 
 import (
 	"fmt"
@@ -12,11 +12,13 @@ import (
 	cltr "github.com/doitintl/banias/frontend/collector"
 	cfg "github.com/doitintl/banias/frontend/config"
 	"github.com/oklog/oklog/pkg/group"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/valyala/fasthttp"
+	"go.opencensus.io/exporter/prometheus"
+	"go.opencensus.io/exporter/stackdriver"
+	"go.opencensus.io/stats/view"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-
 )
 
 var config *cfg.Config
@@ -41,6 +43,22 @@ func main() {
 	defer logger.Sync()
 	logger.Info("Starting Banias....")
 	var err error
+
+
+	pExporter, err := prometheus.NewExporter(prometheus.Options{})
+	if err != nil {
+		logger.Error("Error creating prometheus exporter  ", zap.Error(err))
+	}
+	// Export to Prometheus Monitoring.
+	view.RegisterExporter(pExporter)
+	sExporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: config.ProjectID})
+	if err != nil {
+		logger.Error("Error creating stackdriver exporter  ", zap.Error(err))
+	}
+
+	// Export to Stackdriver Monitoring.
+	view.RegisterExporter(sExporter)
+
 	collector, err = cltr.NewCollector(logger, config)
 	if err != nil {
 		logger.Fatal("Can't init Collector", zap.Error(err))
@@ -49,7 +67,7 @@ func main() {
 	g := &group.Group{}
 
 	initHttpHandler(g, logger)
-	initMetricsEndpoint(g, logger)
+	initMetricsEndpoint(g, logger, pExporter)
 	initCancelInterrupt(g)
 	logger.Info("exit", zap.Error(g.Run()))
 
@@ -72,8 +90,8 @@ func initHttpHandler(g *group.Group, logger *zap.Logger) {
 	})
 
 }
-func initMetricsEndpoint(g *group.Group, logger *zap.Logger) {
-	http.DefaultServeMux.Handle("/metrics", promhttp.Handler())
+func initMetricsEndpoint(g *group.Group, logger *zap.Logger, exporter *prometheus.Exporter) {
+	http.Handle("/metrics", exporter)
 	debugListener, err := net.Listen("tcp", metricsAddr)
 	if err != nil {
 		logger.Info("Error ", zap.String("transport", "debug/HTTP"), zap.String("during", "Listen"), zap.Error(err))

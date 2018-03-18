@@ -8,8 +8,10 @@
     "iam",
     "internal/optional",
     "internal/version",
+    "monitoring/apiv3",
     "pubsub",
-    "pubsub/apiv1"
+    "pubsub/apiv1",
+    "trace/apiv2"
   ]
   revision = "20d4028b8a750c2aca76bf9fefa8ed2d0109b573"
   version = "v0.19.0"
@@ -24,7 +26,7 @@
   branch = "master"
   name = "github.com/buger/jsonparser"
   packages = ["."]
-  revision = "4be68c93a24430ddf9c33d1380b7042fd3a13424"
+  revision = "2cac668e8456b4284edb0715e17e2af02d3ec993"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -41,7 +43,8 @@
     "ptypes/any",
     "ptypes/duration",
     "ptypes/empty",
-    "ptypes/timestamp"
+    "ptypes/timestamp",
+    "ptypes/wrappers"
   ]
   revision = "925541529c1fa6821df4e44ce2723319eb2be768"
   version = "v1.0.0"
@@ -75,7 +78,7 @@
     "coarsetime",
     "pool"
   ]
-  revision = "cd89bd941066b6681cfa5ee59f5f661a342b2d09"
+  revision = "ca54f14b6f1987b97fd83e072981e9d6597753d9"
 
 [[projects]]
   name = "github.com/klauspost/compress"
@@ -167,7 +170,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "6fb6fce6f8b75884b92e1889c150403fc0872c5e"
+  revision = "e4aa40a9169a88835b849a6efb71e05dc04b88f0"
 
 [[projects]]
   branch = "master"
@@ -178,7 +181,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "1c7ff3de94ae006f58cba483a4c9c6d7c61e1d98"
+  revision = "54d17b57dd7d4a3aa092476596b3f8a933bde349"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -225,11 +228,14 @@
 [[projects]]
   name = "go.opencensus.io"
   packages = [
+    "exporter/prometheus",
+    "exporter/stackdriver",
     "internal",
     "internal/tagencoding",
     "plugin/ocgrpc",
-    "plugin/ocgrpc/grpcstats",
-    "plugin/ocgrpc/grpctrace",
+    "plugin/ochttp",
+    "plugin/ochttp/propagation/b3",
+    "plugin/ochttp/propagation/google",
     "stats",
     "stats/internal",
     "stats/view",
@@ -237,8 +243,8 @@
     "trace",
     "trace/propagation"
   ]
-  revision = "c9774183e3e14211cf87f61752279f6b8eb55682"
-  version = "v0.3.0"
+  revision = "52b12e1eb8fdf769ad0bf5fd73a2af9484e6b196"
+  version = "v0.4.0"
 
 [[projects]]
   name = "go.uber.org/atomic"
@@ -278,7 +284,7 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "d25186b37f34ebdbbea8f488ef055638dfab272d"
+  revision = "24dd3780ca4f75fed9f321890729414a4b5d3f13"
 
 [[projects]]
   branch = "master"
@@ -290,7 +296,7 @@
     "jws",
     "jwt"
   ]
-  revision = "2f32c3ac0fa4fb807a0fcefb0b6f2468a0d99bd0"
+  revision = "fdc9e635145ae97e6c2cb777c48305600cf515cb"
 
 [[projects]]
   branch = "master"
@@ -299,13 +305,13 @@
     "errgroup",
     "semaphore"
   ]
-  revision = "fd80eb99c8f653c847d294a001bdf2a3a6f768f5"
+  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "dd2ff4accc098aceecb86b36eaa7829b2a17b1c9"
+  revision = "2f1e207ee39ff70f3433e49c6eb52677a515e3b5"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -341,7 +347,7 @@
     "transport/grpc",
     "transport/http"
   ]
-  revision = "afa8e6afb8175363fc9ede3d2978a36a4e4e7c77"
+  revision = "c24aa0e5ed34558ea50c016e4fb92c5e9aa69f2c"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -367,12 +373,18 @@
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
+    "googleapis/api/distribution",
+    "googleapis/api/label",
+    "googleapis/api/metric",
+    "googleapis/api/monitoredres",
+    "googleapis/devtools/cloudtrace/v2",
     "googleapis/iam/v1",
+    "googleapis/monitoring/v3",
     "googleapis/pubsub/v1",
     "googleapis/rpc/status",
     "protobuf/field_mask"
   ]
-  revision = "df60624c1e9b9d2973e889c7a1cff73155da81c4"
+  revision = "f8c8703595236ae70fdf8789ecb656ea0bcdcf46"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -414,6 +426,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "285e7dd616b38ab5b7e1466b0565fff4bb974a753c82771580c343442a0219f0"
+  inputs-digest = "21ddfb9d56e830c27fd4735cad1bd6e29cc3353f3c2a13c801685a8b1cc9943b"
   solver-name = "gps-cdcl"
   solver-version = 1

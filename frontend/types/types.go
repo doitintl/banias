@@ -1,18 +1,17 @@
 package types
+
 import (
 	"strconv"
 	"strings"
 )
 
-
-
-//{"sender_id",:"id", "events": [ e1, e2, ... ] }
+// {"sender_id",:"id", "events": [ e1, e2, ... ] }
 //
 // where e1 is an object with all the information you need.
 // {
-//"type": { "event_version": ..., "event_name": ...},
-//"payload": { the event payload itself goes here in whatever structure you need },
-//}
+// "type": { "event_version": ..., "event_name": ...},
+// "payload": { the event payload itself goes here in whatever structure you need },
+// }
 
 type TrackRequest struct {
 	SenderID string  `json:"sender_id" valid:"notempty,required"`
@@ -20,11 +19,9 @@ type TrackRequest struct {
 }
 
 type Event struct {
-	TypeField    Type   `json:"type"`
+	TypeField    Type    `json:"type"`
 	PayloadField Payload `json:"payload" valid:"-"`
 }
-
-
 
 // Type is an Event's metadata.
 type Type struct {
@@ -32,11 +29,11 @@ type Type struct {
 	EventNameField    string `json:"event_name" valid:"notempty,required"`
 }
 
-
-type EventMsg struct  {
+type EventMsg struct {
 	SenderID string
 	Event    Event
 }
+
 // Payload is the event's actual data inserted into data stores.
 type Payload map[string]interface{}
 
@@ -48,6 +45,7 @@ type Error struct {
 	// but not if uninitialized.
 	Index *uint64 `json:"index,omitempty"`
 }
+
 // NewError returns an initialized Error.
 func NewError(index uint64, detail string) *Error {
 	return &Error{Index: &index, Detail: detail}
@@ -58,7 +56,8 @@ func (err *Error) Error() string {
 		[]string{"item ", strconv.FormatUint(*err.Index, 10), ": ", err.Detail},
 		"")
 }
-//Example
+
+// Example
 /*
 	logger = log.With(logger, "caller", log.Caller(4))
 
@@ -102,4 +101,4 @@ func (err *Error) Error() string {
 	]
 }
 
- */
+*/
