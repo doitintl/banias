@@ -55,7 +55,6 @@ func main() {
 	if err != nil {
 		logger.Error("Error creating stackdriver exporter  ", zap.Error(err))
 	}
-
 	// Export to Stackdriver Monitoring.
 	view.RegisterExporter(sExporter)
 

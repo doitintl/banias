@@ -121,8 +121,10 @@ spec:
                 name: "banias-frontend-config"
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
+          imagePullPolicy: Always
         volumes:
           - name: google-cloud-key
             secret:
               secretName: pubsub-key
+
 
