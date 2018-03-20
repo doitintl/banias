@@ -57,48 +57,4 @@ func (err *Error) Error() string {
 		"")
 }
 
-// Example
-/*
-	logger = log.With(logger, "caller", log.Caller(4))
 
-{
-	"sender_id": "my id",
-	"types": [{
-			"type": {
-				"event_version": "1",
-				"event_name": "transaction"
-			},
-			"payload": {
-				"action": "buy",
-				"price": 170,
-				"date": "03/31/1967"
-			}
-		},
-		{
-			"type": {
-				"event_version": "1",
-				"event_name": "transaction"
-
-			},
-			"payload": {
-				"action": "sell",
-				"price": 170,
-				"date": "03/31/1967"
-
-			}
-		},
-		{
-			"type": {
-				"event_version": "2",
-				"event_name": "click"
-
-			},
-			"payload": {
-				"screen": "welcome"
-
-			}
-		}
-	]
-}
-
-*/

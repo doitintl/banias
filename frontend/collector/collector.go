@@ -138,7 +138,10 @@ func (c *Collector) Collect(ctx *fasthttp.RequestCtx) {
 			case 2:
 				counter = counter + 4
 				t, _, _, _ := jsonparser.Get(value)
-				err = json.Unmarshal([]byte(t), msg.Event.PayloadField)
+				err = json.Unmarshal(t, &msg.Event.PayloadField)
+				if err != nil {
+					c.logger.Error("Error getting payload ", zap.Error(err))
+				}
 
 			}
 		}, paths...)
