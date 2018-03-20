@@ -322,3 +322,4 @@ add
 .idea/modules.xml
 .idea/workspace.xml
 vendor
+/frontend/ignore.me
