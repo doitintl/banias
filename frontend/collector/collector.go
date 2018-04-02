@@ -145,6 +145,8 @@ func (c *Collector) Collect(ctx *fasthttp.RequestCtx) {
 
 			}
 		}, paths...)
+		// if expect to get three fields so we have a poor man bit fields. All should sum up to 7 (1+2+4) if
+		// this is not the case then we got a missing field error in our hands
 		if counter != 7 {
 			var errString string
 			switch counter {

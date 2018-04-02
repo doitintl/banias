@@ -25,6 +25,7 @@ var config *cfg.Config
 var metricsAddr string
 var httpAddr string
 var collector *cltr.Collector
+// We have to endpoints /track for reporting and /metrics for prometheus.
 
 func main() {
 	config, _ = cfg.NewConfig()
@@ -63,11 +64,13 @@ func main() {
 		logger.Fatal("Can't init Collector", zap.Error(err))
 		os.Exit(-1)
 	}
+	// create a run group.
 	g := &group.Group{}
 
 	initHttpHandler(g, logger)
 	initMetricsEndpoint(g, logger, pExporter)
 	initCancelInterrupt(g)
+	// run the group and wait for exit.
 	logger.Info("exit", zap.Error(g.Run()))
 
 }
