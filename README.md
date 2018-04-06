@@ -1,5 +1,7 @@
 # Banias
 
+![](banias-logo-lowres.png)
+
 [![License](https://img.shields.io/github/license/doitintl/zorya.svg)](LICENSE) [![GitHub stars](https://img.shields.io/github/stars/doitintl/banias.svg?style=social&label=Stars&style=for-the-badge)](https://github.com/doitintl/banias) [![Build Status](https://secure.travis-ci.org/doitintl/banias.png?branch=master)](http://travis-ci.org/doitintl/banias)
 
 
