@@ -10,17 +10,6 @@ public interface BaniasPipelineOptions extends DataflowPipelineOptions {
 	String getEventsSubscriptionPath();
 	void setEventsSubscriptionPath(String value);
 
-/*
-	@Description("Full path for 'control' PubSub subscription to accept messages from. Required. Format: projects/<project_id>/subscriptions/<subscription_id>")
-	@Validation.Required
-	String getControlSubscriptionPath();
-	void setControlSubscriptionPath(String value);
-*/
-
-	@Description("BigQuery events table Prefix.")
-	String getEventsTablePrefix();
-	void setEventsTablePrefix(String value);
-
 	@Description("BigQuery errors table name.")
 	@Validation.Required
 	String getErrorsTableName();

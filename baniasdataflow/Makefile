@@ -6,7 +6,7 @@ TEMP_FOLDER=tmp
 
 EVENTS_SUBSCRIPTION_PATH="projects/$(PROJECT_ID)/subscriptions/BaniasPipeline"
 EVENTS_BQ_TABLE_PREFIX=banias
-ERRORS_TABLE_NAME=$(EVENTS_BQ_TABLE_PREFIX)-error
+ERRORS_TABLE_NAME=error
 DATASET=banias
 
 
@@ -34,7 +34,6 @@ run_local: build
 	--runner=DirectRunner \
 	--defaultWorkerLogLevel=DEBUG \
 	--eventsSubscriptionPath=$(EVENTS_SUBSCRIPTION_PATH) \
-    --eventsTablePrefix=$(EVENTS_BQ_TABLE_PREFIX) \
     --errorsTableName=$(ERRORS_TABLE_NAME) \
     --dataset=$(DATASET) \
 	"
@@ -49,7 +48,6 @@ run: build
 	--runner=DataflowRunner \
 	--defaultWorkerLogLevel=DEBUG \
 	--eventsSubscriptionPath=$(EVENTS_SUBSCRIPTION_PATH) \
-    --eventsTablePrefix=$(EVENTS_BQ_TABLE_PREFIX) \
     --errorsTableName=$(ERRORS_TABLE_NAME) \
     --dataset=$(DATASET) \
 	"

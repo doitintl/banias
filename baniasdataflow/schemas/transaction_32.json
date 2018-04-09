@@ -1,0 +1,59 @@
+[
+  {
+    "name": "SenderID",
+    "mode": "NULLABLE",
+    "type": "STRING"
+  },
+  {
+    "name": "Event",
+    "mode": "NULLABLE",
+    "type": "RECORD",
+    "fields": [
+      {
+        "name": "type",
+        "mode": "NULLABLE",
+        "type": "RECORD",
+        "fields": [
+          {
+            "name": "event_name",
+            "mode": "NULLABLE",
+            "type": "STRING"
+          },
+          {
+            "name": "event_version",
+            "mode": "NULLABLE",
+            "type": "INTEGER"
+          }
+        ]
+      },
+      {
+        "name": "payload",
+        "mode": "NULLABLE",
+        "type": "RECORD",
+        "fields": [
+          {
+            "name": "action",
+            "mode": "NULLABLE",
+            "type": "STRING"
+          },
+          {
+            "name": "price",
+            "mode": "NULLABLE",
+            "type": "INTEGER"
+          },
+          {
+            "name": "date",
+            "mode": "NULLABLE",
+            "type": "DATE"
+          },
+          {
+            "name": "screen",
+            "mode": "NULLABLE",
+            "type": "STRING"
+          }
+
+        ]
+      }
+    ]
+  }
+]
