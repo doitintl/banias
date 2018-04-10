@@ -1,0 +1,50 @@
+{"SenderID":"my id","Event":{"type":{"event_version":"16","event_name":"transaction"},"payload":{"action":"sell","price":170,"screen":"welcome"}}}
+{"SenderID":"my id","Event":{"type":{"event_version":"32","event_name":"transaction"},"payload":{"action":"sell","date":"1967-03-31","price":170,"screen":"welcome"}}}
+{"SenderID":"my id","Event":{"type":{"event_version":"64","event_name":"click"},      "payload":{"action":"sell","date":"1967-03-31","price":170,"screen":"welcome"}}}
+
+{
+   "SenderID":"my id",
+   "Event":{
+      "type":{
+         "event_version":"16",
+         "event_name":"transaction"
+      },
+      "payload":{
+         "action":"sell",
+         "price":170,
+         "screen":"welcome"
+      }
+   }
+}
+
+{
+   "SenderID":"my id",
+   "Event":{
+      "type":{
+         "event_version":"32",
+         "event_name":"transaction"
+      },
+      "payload":{
+         "action":"sell",
+         "date":"1967-03-31",
+         "price":170,
+         "screen":"welcome"
+      }
+   }
+}
+
+{
+   "SenderID":"my id",
+   "Event":{
+      "type":{
+         "event_version":"64",
+         "event_name":"click"
+      },
+      "payload":{
+         "action":"sell",
+         "date":"1967-03-31",
+         "price":170,
+         "screen":"welcome"
+      }
+   }
+}
