@@ -1,4 +1,18 @@
 
+## Installation
+
+* Create a cluster - `scripts/build_cluster.sh`
+* If you want to use Prometheus for monitoring, we would recommend using `https://github.com/camilb/prometheus-kubernetes`  
+* Build the images
+	* Install Dep `https://github.com/golang/dep`
+	* Run `dep ensure`
+	* Build an deploy the image `scripts/dockerize.sh`
+* Create a service account with permission for pub/sub and stackdiver.
+* Download the key file in json formmat
+* Push the key to the cluste - `kubectl create secret generic pubsub-key --from-file=key.json=filename`
+* Change ethe configuration in `deployfrontend-configmap.yaml`
+* Deploy - `kubctl apply -f deploy/.`
+
 
 ### Configuration
   
