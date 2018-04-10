@@ -1,27 +1,26 @@
 package com.doitintl.banias;
 
-import com.google.api.services.bigquery.model.*;
+import com.google.api.services.bigquery.model.TableReference;
+import com.google.api.services.bigquery.model.TableRow;
+import com.google.api.services.bigquery.model.TableSchema;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO;
 import org.apache.beam.sdk.io.gcp.bigquery.DynamicDestinations;
 import org.apache.beam.sdk.io.gcp.bigquery.TableDestination;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.Objects;
 
-public class BaniasPipeline {
+class BaniasPipeline {
 	private static TableSchemas tableSchemas = new TableSchemas();
 
 	private static final TupleTag<TableRow> outputTag = new TupleTag<TableRow>() {};
 	private static final TupleTag<TableRow> errorsTag = new TupleTag<TableRow>() {};
-
-	private static final Logger LOG = LoggerFactory.getLogger(BaniasPipeline.class);
 
 	private static PCollection<TableRow> handleEvents (
 			Pipeline pipeline, BaniasPipelineOptions options) {
@@ -39,7 +38,7 @@ public class BaniasPipeline {
 				.to(new DynamicDestinations<TableRow, String>() {
 					@Override
 					public String getDestination(ValueInSingleWindow<TableRow> event) {
-						return parseDestination(event.getValue());
+						return parseDestination(Objects.requireNonNull(event.getValue()));
 					}
 
 					@Override
@@ -55,13 +54,15 @@ public class BaniasPipeline {
 					}
 
 					private String parseDestination(TableRow row){
-						LinkedHashMap<String, Object> EventRow = (LinkedHashMap<String, Object>)row.get("Event");
-						LinkedHashMap<String, Object> typeRow = (LinkedHashMap<String, Object>)EventRow.get("type");
-						return typeRow.get("event_name").toString() + "_" + typeRow.get("event_version").toString();
+						return row.get("event_name").toString() + "_" + row.get("event_version").toString();
 					}
 				})
-				.withFormatFunction((SerializableFunction<TableRow, TableRow>) input -> input)
-		);
+				.withFormatFunction((SerializableFunction<TableRow, TableRow>) input -> {
+					TableRow output = input.clone();
+					output.remove("event_version");
+					output.remove("event_name");
+					return output;
+				}));
 
 		return mappedEvents.get(errorsTag);
 	}

@@ -4,7 +4,7 @@ import org.apache.beam.runners.dataflow.options.DataflowPipelineOptions;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.Validation;
 
-public interface BaniasPipelineOptions extends DataflowPipelineOptions {
+interface BaniasPipelineOptions extends DataflowPipelineOptions {
 	@Description("Full path for 'events' PubSub subscription to accept messages from. Required. Format: projects/<project_id>/subscriptions/<subscription_id>")
 	@Validation.Required
 	String getEventsSubscriptionPath();

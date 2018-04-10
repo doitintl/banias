@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract class BaseMap extends DoFn<String, TableRow> {
-	protected static final Logger LOG = LoggerFactory.getLogger(BaseMap.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseMap.class);
 	private TupleTag<TableRow> errorsTag;
 
 	BaseMap(TupleTag<TableRow> errorsTag) {
@@ -25,7 +25,15 @@ abstract class BaseMap extends DoFn<String, TableRow> {
 
 		try {
 			JSONObject json = new JSONObject(processContext.element());
-			map(json, tableRow);
+			JSONObject eventJson = json.getJSONObject("Event");
+			JSONObject typeJson = eventJson.getJSONObject("type");
+			JSONObject payloadJson = eventJson.getJSONObject("payload");
+
+			tableRow.set("SenderID", json.getString("SenderID"));
+			tableRow.set("event_version", typeJson.getString("event_version"));
+			tableRow.set("event_name", typeJson.getString("event_name"));
+
+			map(payloadJson, tableRow);
 			processContext.output(tableRow);
 		} catch (Exception e) {
 			LOG.error(e.toString());
