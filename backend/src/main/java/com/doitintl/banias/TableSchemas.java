@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 
 class TableSchemas {
-	private static final String SCHEMA_FILTER_NAME = "Schema";
 	private final HashMap<String, TableSchema> tableSchema;
 	private static final String filesLocation = "./schemas/";
 	private static final Logger LOG = LoggerFactory.getLogger(TableSchemas.class);
@@ -31,8 +30,6 @@ class TableSchemas {
 		tableSchema = new HashMap<>();
 		File folder = new File(filesLocation);
 
-		buildTableSchemaFromDatastore();
-
 		for (String filename : Objects.requireNonNull(folder.list())) {
 		    try{
 		    	buildTableSchemaFromFile(filename);
@@ -41,24 +38,6 @@ class TableSchemas {
 			}
 		}
 	}
-
-	private void buildTableSchemaFromDatastore(){
-/*		Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-		KeyFactory keyFactory = datastore.newKeyFactory().setKind(SCHEMA_FILTER_NAME);
-		IncompleteKey key = keyFactory.setKind(SCHEMA_FILTER_NAME).newKey();
-
-		Query<Entity> query = Query
-				.newEntityQueryBuilder()
-				.setKind(SCHEMA_FILTER_NAME)
-				.build();
-
-		QueryResults<Entity> results = datastore.run(query);
-		while (results.hasNext()) {
-			Entity entity = results.next();
-			String str = entity.toString();
-			LOG.debug(str);
-		}
-*/	}
 
 	private void buildTableSchemaFromFile(String fileName) throws IOException, ParseException {
 		String fullName = filesLocation+fileName;
