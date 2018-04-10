@@ -1,6 +1,3 @@
-# Created by .ignore support plugin (hsz.mobi)
-.idea
-*.iml
 ### Example user template template
 ### Example user template
 
@@ -9,9 +6,6 @@
 *.iml
 out
 gen
-### Java template
-# Compiled class file
-*.class
 
 # Log file
 *.log
@@ -23,7 +17,6 @@ gen
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.zip
