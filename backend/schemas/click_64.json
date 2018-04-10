@@ -1,0 +1,27 @@
+[
+  {
+    "name": "SenderID",
+    "mode": "NULLABLE",
+    "type": "STRING"
+  },
+  {
+    "name": "action",
+    "mode": "NULLABLE",
+    "type": "STRING"
+  },
+  {
+    "name": "price",
+    "mode": "NULLABLE",
+    "type": "INTEGER"
+  },
+  {
+    "name": "date",
+    "mode": "NULLABLE",
+    "type": "DATE"
+  },
+  {
+    "name": "screen",
+    "mode": "NULLABLE",
+    "type": "STRING"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "name": "type",
+    "mode": "NULLABLE",
+    "type": "STRING"
+  },
+  {
+    "name": "raw_input",
+    "mode": "NULLABLE",
+    "type": "STRING"
+  }
+]
