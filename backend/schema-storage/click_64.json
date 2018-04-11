@@ -1,0 +1,61 @@
+{
+  "events": [
+    {
+      "event_name": "click",
+      "event_version": 1,
+      "payload": [
+        {
+          "name": "SenderID",
+          "mode": "NULLABLE",
+          "type": "STRING"
+        },
+        {
+          "name": "action",
+          "mode": "NULLABLE",
+          "type": "STRING"
+        },
+        {
+          "name": "price",
+          "mode": "NULLABLE",
+          "type": "INTEGER"
+        },
+        {
+          "name": "date",
+          "mode": "NULLABLE",
+          "type": "DATE"
+        },
+        {
+          "name": "screen",
+          "mode": "NULLABLE",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "event_name": "transaction",
+      "event_version": 1,
+      "payload": [
+        {
+          "name": "SenderID",
+          "mode": "NULLABLE",
+          "type": "STRING"
+        },
+        {
+          "name": "action",
+          "mode": "NULLABLE",
+          "type": "STRING"
+        },
+        {
+          "name": "price",
+          "mode": "NULLABLE",
+          "type": "INTEGER"
+        },
+        {
+          "name": "screen",
+          "mode": "NULLABLE",
+          "type": "STRING"
+        }
+      ]
+    }
+  ]
+}

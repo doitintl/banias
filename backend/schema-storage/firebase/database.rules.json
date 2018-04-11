@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "foo": {
+      // /foo is readable by the world
+      ".read": true,
+
+      // /foo is writable by the world
+      ".write": true,
+
+      // data written to /foo must be a string less than 100 characters
+      ".validate": "newData.hasChildren(['amount', 'name']) &&newData.child('amount').isNumber() && newData.child('amount').val() > 0"
+    }
+  }
+}
