@@ -10,6 +10,11 @@ interface BaniasPipelineOptions extends DataflowPipelineOptions {
 	String getEventsSubscriptionPath();
 	void setEventsSubscriptionPath(String value);
 
+	@Description("Full path for schemas GCS bucket. Required.")
+	@Validation.Required
+	String getGCSSchemasBucketName();
+	void setGCSSchemasBucketName(String value);
+
 	@Description("BigQuery errors table name.")
 	@Validation.Required
 	String getErrorsTableName();

@@ -2,50 +2,73 @@ package com.doitintl.banias;
 
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableSchema;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-class TableSchemas {
-	private final HashMap<String, TableSchema> tableSchema;
-	private static final String filesLocation = "./schemas/";
-	private static final Logger LOG = LoggerFactory.getLogger(TableSchemas.class);
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-	public TableSchema getTableSchema(String key) {
+class TableSchemas {
+	private static final String filesLocation= "./schemas/";
+	private static final Logger LOG = LoggerFactory.getLogger(TableSchemas.class);
+	private static Storage storage = StorageOptions.getDefaultInstance().getService();
+	private static String bucketName = "";
+	private final HashMap<String, TableSchema> tableSchema = new HashMap<>();
+
+	TableSchema getTableSchema(String key) {
 		return tableSchema.get(key);
 	}
 
-	public TableSchemas() {
-		tableSchema = new HashMap<>();
+	static void setBucketName(String name) {
+		bucketName = name;
+	}
+
+	void loadFromGCS(String gcsFileName){
+		try{
+			String schemaKey = gcsFileName.substring(0,gcsFileName.indexOf(".json"));
+			byte[] content = storage.readAllBytes(BlobId.of(bucketName, gcsFileName));
+			String data = new String(content, UTF_8);
+
+			if (tableSchema.get(schemaKey)==null){
+				JSONParser parser = new org.json.simple.parser.JSONParser();
+				JSONArray jsonSchema = (JSONArray) parser.parse(data);
+				buildTableSchemaFromFile(jsonSchema, schemaKey);
+			}
+		}catch (Exception e){
+			LOG.error(e.toString());
+		}
+	}
+
+	void loadFromLocalFile() {
 		File folder = new File(filesLocation);
 
-		for (String filename : Objects.requireNonNull(folder.list())) {
-		    try{
-		    	buildTableSchemaFromFile(filename);
+		for (String fileName : Objects.requireNonNull(folder.list())) {
+			try{
+				String fullName = filesLocation+fileName;
+				String schemaKey = fileName.substring(0,fileName.indexOf(".json"));
+				JSONParser parser = new org.json.simple.parser.JSONParser();
+				JSONArray jsonSchema = (JSONArray) parser.parse(new FileReader(fullName));
+
+				buildTableSchemaFromFile(jsonSchema, schemaKey);
 			}catch (Exception iox){
 				LOG.error(iox.toString());
 			}
 		}
 	}
 
-	private void buildTableSchemaFromFile(String fileName) throws IOException, ParseException {
-		String fullName = filesLocation+fileName;
-		String schemaKey = fileName.substring(0,fileName.indexOf(".json"));
-
-		JSONParser parser = new org.json.simple.parser.JSONParser();
-		JSONArray jsonSchema = (JSONArray) parser.parse(new FileReader(fullName));
-
+	private void buildTableSchemaFromFile(JSONArray jsonSchema, String schemaKey){
 		ArrayList<TableFieldSchema> fields = new ArrayList<>();
 		for (Object field : jsonSchema) {
 			if (field instanceof JSONObject) {
