@@ -17,13 +17,15 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.transforms.Watch;
 import org.apache.beam.sdk.values.*;
 import org.joda.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Objects;
 
 
 class BaniasPipeline {
-	private static TableSchemas tableSchemas = new TableSchemas();
+	private static final Logger LOG = LoggerFactory.getLogger(BaniasPipeline.class);
+	private static TableSchemas tableSchemas;
 	private static final TupleTag<TableRow> outputTag= new TupleTag<TableRow>() {};
 	private static final TupleTag<TableRow> errorsTag = new TupleTag<TableRow>() {};
 
@@ -45,7 +47,7 @@ class BaniasPipeline {
 				.to(new DynamicDestinations<TableRow, String>() {
 					@Override
 					public String getDestination(ValueInSingleWindow<TableRow> event) {
-						return parseDestination(Objects.requireNonNull(event.getValue()));
+						return parseDestination(event.getValue());
 					}
 
 					@Override
@@ -75,6 +77,7 @@ class BaniasPipeline {
 	}
 
 	private static void handleSchemas (Pipeline schemasPipeline, BaniasPipelineOptions options) {
+		String bucketName = options.getGCSSchemasBucketName();
         PCollection<Metadata> schemas = schemasPipeline
 		    .apply("Read new schema files" ,FileIO.match()
 				    .filepattern("gs://" + options.getGCSSchemasBucketName() + "/*")
@@ -84,7 +87,7 @@ class BaniasPipeline {
 			@ProcessElement
 			public void processElement(ProcessContext processContext) {
 				String out = processContext.element().resourceId().getFilename();
-				tableSchemas.loadFromGCS(out);
+				tableSchemas.loadFromGCS(out,bucketName);
 				processContext.output(out);
 			}
 		}));
@@ -103,8 +106,8 @@ class BaniasPipeline {
 		Pipeline pipeline = Pipeline.create(eventsPipelineOptions);
 
 		// Schemas handling
-		TableSchemas.setBucketName(eventsPipelineOptions.getGCSSchemasBucketName());
-		tableSchemas.loadFromLocalFile();
+		tableSchemas = new TableSchemas();
+
 		handleSchemas(pipeline, eventsPipelineOptions);
 
 		//Events handling

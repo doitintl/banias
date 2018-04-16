@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,23 +21,32 @@ import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-class TableSchemas {
+class TableSchemas implements Serializable {
 	private static final String filesLocation= "./schemas/";
 	private static final Logger LOG = LoggerFactory.getLogger(TableSchemas.class);
-	private static Storage storage = StorageOptions.getDefaultInstance().getService();
-	private static String bucketName = "";
-	private final HashMap<String, TableSchema> tableSchema = new HashMap<>();
+	private static HashMap<String, TableSchema> tableSchema = new HashMap<>();
+
+	public TableSchemas() {
+		loadFromLocalFile();
+	}
 
 	TableSchema getTableSchema(String key) {
 		return tableSchema.get(key);
 	}
 
-	static void setBucketName(String name) {
-		bucketName = name;
+	public String listTableSchema(){
+		return "TableSchema contains now: " + tableSchema.keySet().toString();
 	}
 
-	void loadFromGCS(String gcsFileName){
+	@Override
+	public int hashCode() {
+
+		return Objects.hash(tableSchema);
+	}
+
+	void loadFromGCS(String gcsFileName, String bucketName){
 		try{
+			Storage storage = StorageOptions.getDefaultInstance().getService();
 			String schemaKey = gcsFileName.substring(0,gcsFileName.indexOf(".json"));
 			byte[] content = storage.readAllBytes(BlobId.of(bucketName, gcsFileName));
 			String data = new String(content, UTF_8);
