@@ -20,7 +20,6 @@ import java.util.Objects;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 class TableSchemas implements Serializable {
-	private static final String filesLocation= "./schemas/";
 	private static final String ERROR_SCHEMA_NAME = "errors";
 	private static final Logger LOG = LoggerFactory.getLogger(TableSchemas.class);
 	private static HashMap<String, TableSchema> tableSchema = new HashMap<>();
