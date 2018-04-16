@@ -11,8 +11,6 @@ import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,11 +21,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 class TableSchemas implements Serializable {
 	private static final String filesLocation= "./schemas/";
+	private static final String ERROR_SCHEMA_NAME = "errors";
 	private static final Logger LOG = LoggerFactory.getLogger(TableSchemas.class);
 	private static HashMap<String, TableSchema> tableSchema = new HashMap<>();
 
 	public TableSchemas() {
-		loadFromLocalFile();
+		createErrorTableSchema();
 	}
 
 	TableSchema getTableSchema(String key) {
@@ -61,21 +60,12 @@ class TableSchemas implements Serializable {
 		}
 	}
 
-	void loadFromLocalFile() {
-		File folder = new File(filesLocation);
+	private void createErrorTableSchema(){
+		List<TableFieldSchema> fields = new ArrayList<>();
+		fields.add(new TableFieldSchema().setName("type").setType("STRING").setMode("NULLABLE"));
+		fields.add(new TableFieldSchema().setName("raw_input").setType("STRING").setMode("NULLABLE"));
 
-		for (String fileName : Objects.requireNonNull(folder.list())) {
-			try{
-				String fullName = filesLocation+fileName;
-				String schemaKey = fileName.substring(0,fileName.indexOf(".json"));
-				JSONParser parser = new org.json.simple.parser.JSONParser();
-				JSONArray jsonSchema = (JSONArray) parser.parse(new FileReader(fullName));
-
-				buildTableSchemaFromFile(jsonSchema, schemaKey);
-			}catch (Exception iox){
-				LOG.error(iox.toString());
-			}
-		}
+		tableSchema.put(ERROR_SCHEMA_NAME,buildTableSchema(fields));
 	}
 
 	private void buildTableSchemaFromFile(JSONArray jsonSchema, String schemaKey){
