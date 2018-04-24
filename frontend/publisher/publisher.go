@@ -54,6 +54,7 @@ type Publisher struct {
 	client        *gpubsub.Client
 	wg            *sync.WaitGroup
 	id            int
+	collectorPool     *sync.Pool
 }
 
 func GetClient(projectid string) (*gpubsub.Client, error) {
@@ -80,7 +81,7 @@ func createTopicIfNotExists(topic string, logger *zap.Logger, client *gpubsub.Cl
 	return t, err
 }
 
-func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, client *gpubsub.Client, id int) (*Publisher, error) {
+func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, collectorPool *sync.Pool, client *gpubsub.Client, id int) (*Publisher, error) {
 	logger.Debug("Creating a new publisher", zap.Int("id", id))
 	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount), config.MaxPubSubGoroutineIdleDuration)
 	topic, err := createTopicIfNotExists(config.Topic, logger, client)
@@ -93,6 +94,7 @@ func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cf
 		topic:    topic,
 		wg:       new(sync.WaitGroup),
 		id:       id,
+		collectorPool: collectorPool,
 	}
 	if err != nil {
 		logger.Error("Error creating topic", zap.Error(err))
@@ -158,6 +160,7 @@ func (c *Publisher) Run() {
 			m.Data = buf
 			messages = append(messages, *m)
 			msgPool.Put(m)
+			c.collectorPool.Put(&event)
 			if len(messages) == c.config.PubsubMaxBatch {
 
 				c.logger.Debug("Calling publish due to capacity ", zap.Int("Number of message", len(messages)), zap.Int("Aggrigator ID", c.id))
