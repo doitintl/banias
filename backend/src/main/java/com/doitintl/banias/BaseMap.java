@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 abstract class BaseMap extends DoFn<String, TableRow> {
 	private static final Logger LOG = LoggerFactory.getLogger(BaseMap.class);
+	private static final long serialVersionUID = -7252861063735099405L;
 	private TupleTag<TableRow> errorsTag;
 
 	BaseMap(TupleTag<TableRow> errorsTag) {
@@ -25,6 +26,7 @@ abstract class BaseMap extends DoFn<String, TableRow> {
 
 		try {
 			JSONObject json = new JSONObject(processContext.element());
+
 			JSONObject eventJson = json.getJSONObject("Event");
 			JSONObject typeJson = eventJson.getJSONObject("type");
 			JSONObject payloadJson = eventJson.getJSONObject("payload");
@@ -37,9 +39,11 @@ abstract class BaseMap extends DoFn<String, TableRow> {
 			processContext.output(tableRow);
 		} catch (Exception e) {
 			LOG.error(e.toString());
+			tableRow.clear();
 			tableRow.set("type", getType());
 			tableRow.set("raw_input", processContext.element());
 			processContext.output(errorsTag, tableRow);
 		}
 	}
+
 }

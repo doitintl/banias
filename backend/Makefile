@@ -35,6 +35,7 @@ run_local: build
     --errorsTableName=$(ERRORS_TABLE_NAME) \
     --GCSSchemasBucketName=$(SCHEMAS_BUCKET) \
     --dataset=$(DATASET) \
+    --numWorkers=3 \
 	"
 
 run: build

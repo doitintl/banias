@@ -4,10 +4,12 @@ import com.google.api.services.bigquery.model.TableRow;
 import org.apache.beam.sdk.values.TupleTag;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.Iterator;
 
 class MapEvents extends BaseMap {
-    MapEvents(TupleTag<TableRow> errorsTag) {
+	private static final long serialVersionUID = -8423214840205956145L;
+
+	MapEvents(TupleTag<TableRow> errorsTag) {
         super(errorsTag);
     }
 
