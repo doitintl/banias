@@ -36,17 +36,17 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-core</artifactId>
-            <version>1.25.0</version>
+            <version>1.28.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
-            <version>1.25.0</version>
+            <version>1.28.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-storage</artifactId>
-            <version>v1-rev125-1.21.0</version>
+            <version>v1-rev125-1.23.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

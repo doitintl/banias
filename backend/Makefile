@@ -8,8 +8,10 @@
 
 TABLE_NAME=banias
 SCHEMAS_BUCKET=banias_schemas
-TEMP_BUCKET=banias_temp
+TEMP_BUCKET=banias
 TEMP_FOLDER=tmp
+STAGING_FOLDER=pipeline-staging
+TEMPLATE_FILE=banias_templates
 EVENTS_SUBSCRIPTION_PATH="projects/$(PROJECT_ID)/subscriptions/$(SUBSCRIPTION_NAME)"
 ERRORS_TABLE_NAME=error
 DATASET=banias
@@ -42,9 +44,31 @@ run: build
 	mvn exec:java -Dexec.mainClass=com.doitintl.banias.BaniasPipeline \
 	-Dexec.cleanupDaemonThreads=false \
 	-Dexec.args=" \
+	--jobName="BaniasPipeline" \
 	--project=$(PROJECT_ID) \
 	--tempLocation=gs://$(TEMP_BUCKET)/ \
 	--gcpTempLocation=gs://$(TEMP_BUCKET)/$(TEMP_FOLDER) \
+	--stagingLocation=gs://$(TEMP_BUCKET)/$(STAGING_FOLDER) \
+	--runner=DataflowRunner \
+	--defaultWorkerLogLevel=DEBUG \
+	--eventsSubscriptionPath=$(EVENTS_SUBSCRIPTION_PATH) \
+    --errorsTableName=$(ERRORS_TABLE_NAME) \
+    --GCSSchemasBucketName=$(SCHEMAS_BUCKET) \
+    --dataset=$(DATASET) \
+    --numWorkers=3 \
+    --update=true \
+	"
+
+create_template: build
+	mvn exec:java -Dexec.mainClass=com.doitintl.banias.BaniasPipeline \
+	-Dexec.cleanupDaemonThreads=false \
+	-Dexec.args=" \
+	--jobName="BaniasPipeline" \
+	--project=$(PROJECT_ID) \
+	--tempLocation=gs://$(TEMP_BUCKET)/ \
+	--gcpTempLocation=gs://$(TEMP_BUCKET)/$(TEMP_FOLDER) \
+	--stagingLocation=gs://$(TEMP_BUCKET)/$(STAGING_FOLDER) \
+	--templateLocation=gs://$(TEMP_BUCKET)/$(TEMPLATE_FILE) \
 	--runner=DataflowRunner \
 	--defaultWorkerLogLevel=DEBUG \
 	--eventsSubscriptionPath=$(EVENTS_SUBSCRIPTION_PATH) \
@@ -53,7 +77,6 @@ run: build
     --dataset=$(DATASET) \
     --numWorkers=3 \
 	"
-
 
 ### Helpers:
 _create_tmp_bucket:
