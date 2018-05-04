@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -21,8 +21,8 @@ class SchemaHelpers implements Serializable {
 	private static final Logger LOG = LoggerFactory.getLogger(SchemaHelpers.class);
 	private static final long serialVersionUID = 4048366826024870134L;
 
-	static Hashtable<String,TableSchema> loadSchemaFromGCS(String bucketName){
-		Hashtable<String,TableSchema> schemas = new Hashtable<>();
+	static ConcurrentHashMap<String,TableSchema> loadSchemaFromGCS(String bucketName){
+		ConcurrentHashMap<String,TableSchema> schemas = new ConcurrentHashMap<>();
 		try{
 			Storage storage = StorageOptions.getDefaultInstance().getService();
 			Bucket bucket = storage.get(bucketName);

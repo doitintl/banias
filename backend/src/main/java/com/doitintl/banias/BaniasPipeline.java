@@ -14,12 +14,12 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.*;
 
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 
 class BaniasPipeline {
 	private static final TupleTag<TableRow> outputTag= new TupleTag<>();
 	private static final TupleTag<TableRow> errorsTag = new TupleTag<>();
-	private static Hashtable<String,TableSchema>  schemas;
+	private static ConcurrentHashMap<String,TableSchema> schemas;
 
 	public static void main(String[] args){
 		PipelineOptionsFactory.register(BaniasPipelineOptions.class);
