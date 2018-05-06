@@ -56,7 +56,6 @@ run: build
     --GCSSchemasBucketName=$(SCHEMAS_BUCKET) \
     --dataset=$(DATASET) \
     --numWorkers=3 \
-    --update=true \
 	"
 
 create_template: build

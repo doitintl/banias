@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class BaniasPipeline {
 	private static final TupleTag<TableRow> outputTag= new TupleTag<>();
 	private static final TupleTag<TableRow> errorsTag = new TupleTag<>();
+	private static String tableDestinationPrefix;
 	private static ConcurrentHashMap<String,TableSchema> schemas;
 
 	public static void main(String[] args){
@@ -31,27 +32,17 @@ class BaniasPipeline {
 
 		pipelineOptions.setStreaming(true);
 
+		tableDestinationPrefix = pipelineOptions.getProject() + ":" + pipelineOptions.getDataset() + ".";
+		schemas= SchemaHelpers.loadSchemaFromGCS(pipelineOptions.getGCSSchemasBucketName());
+
 		// Define pipeline
 		Pipeline pipeline = Pipeline.create(pipelineOptions);
-
-		//Events handling
-		PCollection<TableRow> errorEvents = handleEvents(pipeline, pipelineOptions);
-
-		//Error handling
-		handleErrors(errorEvents, pipelineOptions);
-
-		pipeline.run();
-	}
-
-	private static PCollection<TableRow> handleEvents (Pipeline pipeline, BaniasPipelineOptions options) {
-		final String tableDestinationPrefix = options.getProject() + ":" + options.getDataset() + ".";
-		schemas= SchemaHelpers.loadSchemaFromGCS(options.getGCSSchemasBucketName());
 
 		//Events handling
 		PCollectionTuple mappedEvents = pipeline
 				.apply("Read Events from PubSub Messages", PubsubIO
 						.readStrings()
-						.fromSubscription(options.getEventsSubscriptionPath()))
+						.fromSubscription(pipelineOptions.getEventsSubscriptionPath()))
 				.apply("Map Events", ParDo.of(new MapEvents(errorsTag))
 						.withOutputTags(outputTag, TupleTagList.of(errorsTag)));
 
@@ -101,20 +92,22 @@ class BaniasPipeline {
 					return output;
 				}));
 
-		return mappedEvents.get(errorsTag);
-	}
+		PCollection<TableRow> errors = mappedEvents.get(errorsTag);
 
-	private static void handleErrors(PCollection<TableRow> errorEvents, BaniasPipelineOptions options){
+		//Error handling
 		TableReference tableRef = new TableReference()
-				.setProjectId(options.getProject())
-				.setDatasetId(options.getDataset())
-				.setTableId(options.getErrorsTableName());
+				.setProjectId(pipelineOptions.getProject())
+				.setDatasetId(pipelineOptions.getDataset())
+				.setTableId(pipelineOptions.getErrorsTableName());
 
-		errorEvents.setCoder(TableRowJsonCoder.of());
-		errorEvents.apply("Write Errors to BigQuery",
+		errors.setCoder(TableRowJsonCoder.of());
+		errors.apply("Write Errors to BigQuery",
 				BigQueryIO.writeTableRows().to(tableRef)
 						.withSchema(SchemaHelpers.getErrorTableSchema())
 						.withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
 						.withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND));
+
+
+		pipeline.run();
 	}
 }
