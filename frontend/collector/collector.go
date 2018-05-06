@@ -87,7 +87,7 @@ func NewCollector(logger *zap.Logger, config *cfg.Config) (*Collector, error) {
 
 	for i := 0; i < config.PubSubAggrigators; i++ {
 		client, err := publisher.GetClient(config.ProjectID)
-		pub, err := publisher.NewPublisher(logger, bqEvents, config, client, i)
+		pub, err := publisher.NewPublisher(logger, bqEvents, config, msgPool, client, i)
 		if err == nil {
 			c.gp.Go(pub.Run)
 		} else {
@@ -174,7 +174,6 @@ func (c *Collector) Collect(ctx *fasthttp.RequestCtx) {
 			c.bqEvents <- *msg
 
 		}
-		msgPool.Put(msg)
 
 	}, "events")
 	ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
