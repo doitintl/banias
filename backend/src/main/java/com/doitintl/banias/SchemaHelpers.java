@@ -21,8 +21,8 @@ class SchemaHelpers implements Serializable {
 	private static final Logger LOG = LoggerFactory.getLogger(SchemaHelpers.class);
 	private static final long serialVersionUID = 4048366826024870134L;
 
-	static ConcurrentHashMap<String,TableSchema> loadSchemaFromGCS(String bucketName){
-		ConcurrentHashMap<String,TableSchema> schemas = new ConcurrentHashMap<>();
+	static ConcurrentHashMap<String,String> loadSchemaFromGCS(String bucketName){
+		ConcurrentHashMap<String,String> schemas = new ConcurrentHashMap<>();
 		try{
 			Storage storage = StorageOptions.getDefaultInstance().getService();
 			Bucket bucket = storage.get(bucketName);
@@ -31,7 +31,7 @@ class SchemaHelpers implements Serializable {
 				String gcsFileName = blob.getName();
 				String key = gcsFileName.substring(0,gcsFileName.indexOf(".json"));
 
-				TableSchema val = fromJsonString(new String(storage.readAllBytes(blob.getBlobId()), UTF_8));
+				String val = new String(storage.readAllBytes(blob.getBlobId()), UTF_8);
 
 				schemas.put(key, val);
 			});
@@ -42,7 +42,7 @@ class SchemaHelpers implements Serializable {
 		return schemas;
 	}
 
-	private static TableSchema fromJsonString(String json) {
+	static TableSchema fromJsonString(String json) {
 		if (json == null) {
 			return null;
 		}
