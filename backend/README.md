@@ -1,0 +1,36 @@
+## General
+Banias aim to provide an easy way to ingest events into Google's BigQuery with the ability to have new schemas as events evolve with minimum code changes.
+To achieve this we are using Apache Beam on top of Google's DataFlow as our backend engine.
+The code here is a baseline for any transformation graph you would like to create in the future. You can always extend the BaseMap or the MapEvents to get some funky stuff into the graph :-)
+
+Our deployment is driven by a Makefile so you don't need to type too much to get things running...
+
+## Prerequisits
+* Java(TM) SE Runtime Environment 1.8
+* Apache Maven 3.5
+
+## Configuration
+* PROJECT_ID=<YOUR_PROJECT_ID>
+* DATASET_NAME=<YOUR_DATASET_NAME>
+* TOPIC_NAME=<YOUR_TOPIC_NAME>
+* SUBSCRIPTION_NAME=<YOUR_SUBSCRIPTION_NAME>
+* SCHEMAS_BUCKET=<YOUR_BANIAS_SCHEMAS_BUCKET>
+* TEMP_BUCKET=<YOUR_TEMP_BUCKET>
+* TEMPLATE_BUCKET=<YOUR_TEMPLATE_BUCKET>
+* TEMPLATE_FILE=<YOUR_TEMPLATE_FILE_NAME>
+
+All bucket names should contain only the name. No 'gs://' prefix.
+
+##Running
+### Setup environment
+make env_setup PROJECT_ID=my-project TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket TEMPLATE_BUCKET=my-templates-bucket TEMPLATE_FILE=template-name
+
+### Running locally
+make run_local PROJECT_ID=my-project DATASET_NAME=important-dataset TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket
+
+### Running on Google's Dataflow
+make run PROJECT_ID=my-project DATASET_NAME=important-dataset TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket
+
+### Creating a template for Google DataFlow
+### Running on Google's Dataflow
+make run PROJECT_ID=my-project DATASET_NAME=important-dataset TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket TEMPLATE_BUCKET=my-templates-bucket TEMPLATE_FILE=template-name
