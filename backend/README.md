@@ -21,7 +21,7 @@ Our deployment is driven by a Makefile so you don't need to type too much to get
 
 All bucket names should contain only the name. No 'gs://' prefix.
 
-##Running
+## Running
 ### Setup environment
 ```
 make env_setup PROJECT_ID=my-project TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket TEMPLATE_BUCKET=my-templates-bucket TEMPLATE_FILE=template-name
@@ -38,7 +38,6 @@ make run PROJECT_ID=my-project DATASET_NAME=important-dataset TOPIC_NAME=topic-n
 ```
 
 ### Creating a template for Google DataFlow
-### Running on Google's Dataflow
 ```
 make run PROJECT_ID=my-project DATASET_NAME=important-dataset TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket TEMPLATE_BUCKET=my-templates-bucket TEMPLATE_FILE=template-name
 ```
