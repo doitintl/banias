@@ -21,6 +21,16 @@ Our deployment is driven by a Makefile so you don't need to type too much to get
 
 All bucket names should contain only the name. No 'gs://' prefix.
 
+### Schemas Guidelines
+* Once the pipeline is started, it will look for the schemas to work on in the SCHEMAS_BUCKET.
+* The schema files are in a json format. Sample schemas can be found under the test folder
+* The file name (without the '.json') define the schema's key. It will be used to match the event with the schema.
+* The events will be mapped according to it's event_name + event_version --> schema key ('event_name'_'event_version' = schema key) 
+* If you want to add a new schema, just:
+	* Put the new json file in the bucket
+	* Restart your pipeline (It is recommended here to use a template)
+* Schema cannot be modified.
+
 ## Running
 ### Setup environment
 ```
