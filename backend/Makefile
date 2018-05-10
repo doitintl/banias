@@ -81,8 +81,10 @@ create_template: build
 ### Helpers:
 _create_buckets:
 	gsutil ls -b gs://$(TEMP_BUCKET) || gsutil mb gs://$(TEMP_BUCKET)
-	gsutil ls -b gs://$(TEMPLATE_BUCKET) || gsutil mb gs://$(TEMPLATE_BUCKET)
 	gsutil ls -b gs://$(SCHEMAS_BUCKET) || gsutil mb gs://$(SCHEMAS_BUCKET)
+ifdef TEMPLATE_BUCKET
+	gsutil ls -b gs://$(TEMPLATE_BUCKET) || gsutil mb gs://$(TEMPLATE_BUCKET)
+endif
 
 _create_topic:
 	gcloud pubsub --project $(PROJECT_ID) topics create $(TOPIC_NAME)
