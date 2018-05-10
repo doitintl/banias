@@ -87,7 +87,7 @@ ifdef TEMPLATE_BUCKET
 endif
 
 _create_topic:
-	gcloud pubsub --project $(PROJECT_ID) topics create $(TOPIC_NAME)
+	gcloud pubsub --project $(PROJECT_ID) topics list | grep $(TOPIC_NAME) || gcloud pubsub --project $(PROJECT_ID) topics create $(TOPIC_NAME)
 
 _create_subscription:
-	gcloud pubsub --project $(PROJECT_ID) subscriptions create $(SUBSCRIPTION_NAME) --topic=$(TOPIC_NAME)
+	gcloud pubsub --project $(PROJECT_ID) subscriptions list | grep $(SUBSCRIPTION_NAME) || gcloud pubsub --project $(PROJECT_ID) subscriptions create $(SUBSCRIPTION_NAME) --topic=$(TOPIC_NAME)
