@@ -20,6 +20,7 @@ Our deployment is driven by a Makefile so you don't need to type too much to get
 * Temp bucket: TEMP_BUCKET=<YOUR_TEMP_BUCKET>
 * Template bucket: TEMPLATE_BUCKET=<YOUR_TEMPLATE_BUCKET>
 * Template file name: TEMPLATE_FILE=<YOUR_TEMPLATE_FILE_NAME>
+* Dataset location: DATASET_LOCATION=<YOUR_DATASET_LOCATION> Can be asia-northeast1, EU or US. More info [here](https://cloud.google.com/bigquery/docs/dataset-locations)
 
 All bucket names should contain only the name. No 'gs://' prefix.
 
@@ -43,7 +44,7 @@ Banias utilize the standard schema format used by Google's BigQuery. You can fin
 ## Running
 ### Setup environment
 ```
-make env_setup PROJECT_ID=my-project TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket TEMPLATE_BUCKET=my-templates-bucket TEMPLATE_FILE=template-name
+make env_setup PROJECT_ID=my-project TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket TEMPLATE_BUCKET=my-templates-bucket TEMPLATE_FILE=template-name DATASET_LOCATION=US
 ```
 
 ### Running locally

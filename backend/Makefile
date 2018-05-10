@@ -5,10 +5,11 @@
 # DATASET_NAME=<YOUR_DATASET_NAME>
 # TOPIC_NAME=<YOUR_TOPIC_NAME>
 # SUBSCRIPTION_NAME=<YOUR_SUBSCRIPTION_NAME>
-# SCHEMAS_BUCKET=<YOUR_BANIAS_SCHEMAS_BUCKET> Only the name. No gs://
+# SCHEMAS_BUCKET=<YOUR_BANIAS_SCHEMAS_BUCKET>
 # TEMP_BUCKET=<YOUR_TEMP_BUCKET>
 # TEMPLATE_BUCKET=<YOUR_TEMPLATE_BUCKET>
 # TEMPLATE_FILE=<YOUR_TEMPLATE_FILE_NAME>
+# DATASET_LOCATION=<YOUR_DATASET_LOCATION>
 
 TABLE_NAME=banias
 TEMP_FOLDER=tmp
@@ -17,7 +18,8 @@ EVENTS_SUBSCRIPTION_PATH="projects/$(PROJECT_ID)/subscriptions/$(SUBSCRIPTION_NA
 ERRORS_TABLE_NAME=error
 DATASET=banias
 
-env_setup: _create_buckets _create_topic _create_subscription
+
+env_setup: _create_buckets _create_topic _create_subscription _create_dataset
 
 install:
 	mvn install
@@ -86,8 +88,11 @@ ifdef TEMPLATE_BUCKET
 	gsutil ls -b gs://$(TEMPLATE_BUCKET) || gsutil mb gs://$(TEMPLATE_BUCKET)
 endif
 
+_create_dataset:
+	bq ls | grep -w $(DATASET) || bq --location=$(DATASET_LOCATION) mk --dataset $(PROJECT_ID):$(DATASET)
+
 _create_topic:
-	gcloud pubsub --project $(PROJECT_ID) topics list | grep $(TOPIC_NAME) || gcloud pubsub --project $(PROJECT_ID) topics create $(TOPIC_NAME)
+	gcloud pubsub --project $(PROJECT_ID) topics list | grep -w $(TOPIC_NAME) || gcloud pubsub --project $(PROJECT_ID) topics create $(TOPIC_NAME)
 
 _create_subscription:
-	gcloud pubsub --project $(PROJECT_ID) subscriptions list | grep $(SUBSCRIPTION_NAME) || gcloud pubsub --project $(PROJECT_ID) subscriptions create $(SUBSCRIPTION_NAME) --topic=$(TOPIC_NAME)
+	gcloud pubsub --project $(PROJECT_ID) subscriptions list | grep -w $(SUBSCRIPTION_NAME) || gcloud pubsub --project $(PROJECT_ID) subscriptions create $(SUBSCRIPTION_NAME) --topic=$(TOPIC_NAME)
