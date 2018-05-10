@@ -10,7 +10,7 @@
       "payload": {
         "action": "buy",
         "price": 170,
-        "date": "03/31/1967"
+        "date": "1967-03-31"
       }
     },
     {
@@ -21,7 +21,7 @@
       "payload": {
         "action": "sell",
         "price": 170,
-        "date": "03/31/1967"
+        "date": "1967-03-31"
       }
     },
     {
@@ -32,7 +32,7 @@
       "payload": {
         "action": "sell",
         "price": 1120,
-        "date": "03/31/1967"
+        "date": "1967-03-31"
       }
     },
     {
@@ -43,7 +43,7 @@
       "payload": {
         "action": "sell",
         "price": 171,
-        "date": "03/31/1967"
+        "date": "1967-03-31"
       }
     },
     {
@@ -54,7 +54,7 @@
       "payload": {
         "action": "sell",
         "price": 172,
-        "date": "03/31/1967"
+        "date": "1967-03-31"
       }
     },
     {
