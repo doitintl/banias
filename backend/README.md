@@ -1,5 +1,6 @@
-## General
-BigQuery is Google's serverless, highly scalable, low cost enterprise data warehouse designed to make all your data analysts productive. Because there is no infrastructure to manage, you can focus on analyzing data to find meaningful insights using familiar SQL and you don't need a database administrator.
+ ## General
+BigQuery is Google's serverless, highly scalable, low cost enterprise data warehouse designed to make all your data analysts productive. Because there is no infrastructure to manage, you can focus on analyzing data to find meaningful insights using familiar SQL and you don't need a database administrator.  
+
 Banias aim to provide an easy way to ingest events into Google's BigQuery with the ability to have new schemas as events evolve with minimum code changes.
 To achieve this we are using Apache Beam on top of Google's DataFlow as our backend engine.
 The code here is a baseline for any transformation graph you would like to create in the future. You can always extend the BaseMap or the MapEvents to get some funky stuff into the graph :-)
@@ -24,10 +25,10 @@ All bucket names should contain only the name. No 'gs://' prefix.
 
 
 ## Schemas
-BigQuery allows you to specify a table's schema when you load data into a table, and when you create an empty table.
-When you specify a table schema, you must supply each column's name and data type. You may optionally supply a column's description and mode.
-You can find more information about schema and schema creation [here](https://cloud.google.com/bigquery/docs/schemas).
-Banias utilize the standard schemas used by Google's BigQuery. You can find sample schemas can be found under the test folder. 
+BigQuery allows you to specify a table's schema when you load data into a table, and when you create an empty table.  
+When you specify a table schema, you must supply each column's name and data type. You may optionally supply a column's description and mode.  
+You can find more information about schema and schema creation [here](https://cloud.google.com/bigquery/docs/schemas).  
+Banias utilize the standard schema format used by Google's BigQuery. You can find sample schemas can be found under the test folder. 
 
 ### Schemas Guidelines
 * Once the pipeline is started, it will look for the schemas to work on in the SCHEMAS_BUCKET.
