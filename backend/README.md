@@ -41,6 +41,10 @@ Banias utilize the standard schema format used by Google's BigQuery. You can fin
 	* Restart your pipeline (It is recommended here to use a template)
 * Schema cannot be modified.
 
+### Error table
+In the error table you will find all the elements that had issues (not having a schema is not an issue...).  
+The error table contains the the event type, content and the error that got this event to the error table.  
+
 ## Running
 ### Setup environment
 ```
@@ -51,6 +55,7 @@ make env_setup PROJECT_ID=my-project TOPIC_NAME=topic-name SUBSCRIPTION_NAME=sub
 ```
 make run_local PROJECT_ID=my-project DATASET_NAME=important-dataset TOPIC_NAME=topic-name SUBSCRIPTION_NAME=subscription-name SCHEMAS_BUCKET=bucket-with-my-schemas TEMP_BUCKET=mytmpbucket
 ```
+> Note: Sending event with no schema to a pipeline running with DirectRunner will cause the runner to exit.
 
 ### Running on Google's Dataflow
 ```

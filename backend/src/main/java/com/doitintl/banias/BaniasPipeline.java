@@ -51,31 +51,30 @@ class BaniasPipeline {
 
 		PCollection<TableRow> events = mappedEvents.get(outputTag);
 
-	    events.apply(
+		events.apply(
 	        "Write To Dynamic Table on BQ",
 	        BigQueryIO.<TableRow>write()
 	            .withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED)
 	            .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND)
-	            .to(
-	                new EventDestinations(schemas, tableDestinationPrefix))
-	            .withFormatFunction(
-	                (SerializableFunction<TableRow, TableRow>)
-	                    input -> {
-	                	TableRow output = input.clone();
-	                	output.remove("event_version");
-	                	output.remove("event_name");
-	                	return output;
-	                }));
-
-		PCollection<TableRow> errors = mappedEvents.get(errorsTag);
+	            .to(new EventDestinations(schemas, tableDestinationPrefix))
+			        .withFormatFunction(
+			        		(SerializableFunction<TableRow, TableRow>)
+							        input -> {
+			        			TableRow output = input.clone();
+			        			output.remove("event_version");
+			        			output.remove("event_name");
+			        			return output;
+			        		}));
 
 		//Error handling
+		PCollection<TableRow> errors = mappedEvents.get(errorsTag);
+		errors.setCoder(TableRowJsonCoder.of());
+
 		TableReference tableRef = new TableReference()
 				.setProjectId(pipelineOptions.getProject())
 				.setDatasetId(pipelineOptions.getDataset())
 				.setTableId(pipelineOptions.getErrorsTableName());
 
-		errors.setCoder(TableRowJsonCoder.of());
 		errors.apply("Write Errors to BigQuery",
 				BigQueryIO.writeTableRows().to(tableRef)
 						.withSchema(SchemaHelpers.getErrorTableSchema())
@@ -86,6 +85,7 @@ class BaniasPipeline {
 	}
 
 	private static class EventDestinations extends DynamicDestinations<TableRow, String> {
+		private static final long serialVersionUID = -2839237244568662696L;
 		private final ConcurrentHashMap<String,String> schemas;
 		private final String tableDestinationPrefix;
 
@@ -93,8 +93,6 @@ class BaniasPipeline {
 			this.schemas = schemas;
 			this.tableDestinationPrefix = tableDestinationPrefix;
 		}
-
-		private static final long serialVersionUID = -2839237244568662696L;
 
 		@Override
 		public String getDestination(ValueInSingleWindow<TableRow> event) {

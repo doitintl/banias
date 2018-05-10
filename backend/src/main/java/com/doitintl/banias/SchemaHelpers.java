@@ -21,6 +21,11 @@ class SchemaHelpers implements Serializable {
 	private static final Logger LOG = LoggerFactory.getLogger(SchemaHelpers.class);
 	private static final long serialVersionUID = 4048366826024870134L;
 
+	static final String ERROR_EVENT_TYPE_STR = "type";
+	static final String ERROR_EVENT_RAW_INPUT_STR = "raw_input";
+	static final String ERROR_EVENT_ERROR_STR = "error";
+	static final String ERROR_EVENT_DONT_HAVE_SCHEMA = "Event don't have a predefined schema";
+
 	static ConcurrentHashMap<String,String> loadSchemaFromGCS(String bucketName){
 		ConcurrentHashMap<String,String> schemas = new ConcurrentHashMap<>();
 		try{
@@ -56,8 +61,9 @@ class SchemaHelpers implements Serializable {
 
 	static TableSchema getErrorTableSchema(){
 		List<TableFieldSchema> fields = new ArrayList<>();
-		fields.add(new TableFieldSchema().setName("type").setType("STRING").setMode("NULLABLE"));
-		fields.add(new TableFieldSchema().setName("raw_input").setType("STRING").setMode("NULLABLE"));
+		fields.add(new TableFieldSchema().setName(ERROR_EVENT_TYPE_STR).setType("STRING").setMode("NULLABLE"));
+		fields.add(new TableFieldSchema().setName(ERROR_EVENT_RAW_INPUT_STR).setType("STRING").setMode("NULLABLE"));
+		fields.add(new TableFieldSchema().setName(ERROR_EVENT_ERROR_STR).setType("STRING").setMode("NULLABLE"));
 
 		TableSchema tableSchema = new TableSchema();
 		tableSchema.setFields(fields);

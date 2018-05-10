@@ -37,13 +37,14 @@ abstract class BaseMap extends DoFn<String, TableRow> {
 
 			map(payloadJson, tableRow);
 			processContext.output(tableRow);
+
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			tableRow.clear();
-			tableRow.set("type", getType());
-			tableRow.set("raw_input", processContext.element());
+			tableRow.set(SchemaHelpers.ERROR_EVENT_TYPE_STR, getType());
+			tableRow.set(SchemaHelpers.ERROR_EVENT_RAW_INPUT_STR, processContext.element());
+			tableRow.set(SchemaHelpers.ERROR_EVENT_ERROR_STR, e.toString());
 			processContext.output(errorsTag, tableRow);
 		}
 	}
-
 }

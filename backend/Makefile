@@ -38,7 +38,7 @@ run_local: build
 	--defaultWorkerLogLevel=DEBUG \
 	--eventsSubscriptionPath=$(EVENTS_SUBSCRIPTION_PATH) \
     --errorsTableName=$(ERRORS_TABLE_NAME) \
-    --GCSSchemasBucketName=$(SCHEMAS_BUCKET) \
+    --GCSSchemasBucketName=(SCHEMAS_BUCKET) \
     --dataset=$(DATASET) \
     --numWorkers=3 \
 	"
@@ -75,7 +75,7 @@ create_template: build
 	--defaultWorkerLogLevel=DEBUG \
 	--eventsSubscriptionPath=$(EVENTS_SUBSCRIPTION_PATH) \
     --errorsTableName=$(ERRORS_TABLE_NAME) \
-    --GCSSchemasBucketName=$(SCHEMAS_BUCKET) \
+    --GCSSchemasBucketName=(SCHEMAS_BUCKET) \
     --dataset=$(DATASET) \
     --numWorkers=3 \
 	"
