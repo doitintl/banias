@@ -8,8 +8,8 @@ spec:
     apiVersion: apps/v1beta1
     kind: Deployment
     name: banias-frontend
-  minReplicas: 2
-  maxReplicas: 2
+  minReplicas: 3
+  maxReplicas: 20
   metrics:
   - type: Resource
     resource:

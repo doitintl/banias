@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: banias-frontend
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
         app: banias-frontend
@@ -59,7 +59,7 @@ spec:
             privileged: true
         containers:
         - name: "banias-frontend"
-          image: "gcr.io/aviv-playground/banias-frontend:test"
+          image: "gcr.io/my-project/banias-frontend:test"
           volumeMounts:
           - name: google-cloud-key
             mountPath: /var/secrets/google
