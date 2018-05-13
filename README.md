@@ -16,7 +16,7 @@ Banias Architecture:
 
 ![](Banias_Architecture.png)
 
-## Installtion
+## Installation
 
 ### [API Deployment](frontend/README.md)
 
