@@ -60,6 +60,13 @@ spec:
         containers:
         - name: "banias-frontend"
           image: "gcr.io/my-project/banias-frontend:test"
+          resources:
+            requests:
+              memory: "32"
+              cpu: "500m"
+            limits:
+              memory: "60Mi"
+              cpu: "1250m"
           volumeMounts:
           - name: google-cloud-key
             mountPath: /var/secrets/google
