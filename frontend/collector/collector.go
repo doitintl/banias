@@ -76,7 +76,7 @@ type Collector struct {
 func NewCollector(logger *zap.Logger, config *cfg.Config) (*Collector, error) {
 	bqEvents := make(chan types.EventMsg, int(config.PubsubMaxBatch*config.PubSubAggrigators))
 	doneChan := make(chan bool)
-	gp := pool.NewGoPool(int(config.PubSubAggrigators), config.MaxPubSubGoroutineIdleDuration)
+	gp := pool.NewGoPool(int(config.PubSubAggrigators), config.MaxPubSubGoroutineIdleDuration *time.Second)
 	c := Collector{
 		bqEvents: bqEvents,
 		doneChan: doneChan,

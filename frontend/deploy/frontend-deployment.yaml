@@ -59,14 +59,14 @@ spec:
             privileged: true
         containers:
         - name: "banias-frontend"
-          image: "gcr.io/my-project/banias-frontend:test"
+          image: "gcr.io/aviv-playground/banias-frontend:test"
           resources:
-            requests:
-              memory: "32"
-              cpu: "500m"
             limits:
-              memory: "60Mi"
-              cpu: "1250m"
+              cpu: "2"
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 200Mi
           volumeMounts:
           - name: google-cloud-key
             mountPath: /var/secrets/google
