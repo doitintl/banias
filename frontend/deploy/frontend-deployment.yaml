@@ -59,7 +59,7 @@ spec:
             privileged: true
         containers:
         - name: "banias-frontend"
-          image: "gcr.io/aviv-playground/banias-frontend:test"
+          image: "gcr.io/my-project/banias-frontend:test"
           resources:
             limits:
               cpu: "2"
