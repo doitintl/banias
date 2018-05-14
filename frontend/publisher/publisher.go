@@ -83,7 +83,7 @@ func createTopicIfNotExists(topic string, logger *zap.Logger, client *gpubsub.Cl
 
 func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, collectorPool *sync.Pool, client *gpubsub.Client, id int) (*Publisher, error) {
 	logger.Debug("Creating a new publisher", zap.Int("id", id))
-	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount), config.MaxPubSubGoroutineIdleDuration)
+	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount), config.MaxPubSubGoroutineIdleDuration * time.Second)
 	topic, err := createTopicIfNotExists(config.Topic, logger, client)
 	logger.Debug("Done with topic")
 	p := Publisher{

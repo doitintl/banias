@@ -5,11 +5,9 @@ metadata:
   labels:
     app: banias-frontend
 spec:
-  type: LoadBalancer
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8081
+  type: NodePort
   selector:
     app: banias-frontend
-
+  ports:
+  - name: http
+    port: 8081

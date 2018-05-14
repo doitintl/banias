@@ -80,6 +80,8 @@ func initHttpHandler(g *group.Group, logger *zap.Logger) {
 		switch string(ctx.Path()) {
 		case "/track":
 			collector.Collect(ctx)
+		case "/":
+			ctx.Response.SetStatusCode(200)
 		default:
 			ctx.Error("Unsupported path", fasthttp.StatusNotFound)
 		}
