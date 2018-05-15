@@ -10,6 +10,8 @@
 * Create a service account with permission for Google Pub/Sub and Stackdiver.
 * Download the key file in JSON format
 * Create secret - `kubectl create secret generic pubsub-key --from-file=key.json=filename`
+* Replace `BANIAS_PROJECTID: "my-project"` to your project name in `deployfrontend-configmap.yaml`
+* Replace `image: "gcr.io/my-project/banias-frontend:test"` to your project name and version in `deploy/frontend-deployment.yaml`
 * Change the configuration in `deployfrontend-configmap.yaml`
 * Deploy - `kubctl apply -f deploy/.`
 
