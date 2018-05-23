@@ -47,7 +47,6 @@ run: build
 	mvn exec:java -Dexec.mainClass=com.doitintl.banias.BaniasPipeline \
 	-Dexec.cleanupDaemonThreads=false \
 	-Dexec.args=" \
-	--jobName="BaniasPipeline" \
 	--project=$(PROJECT_ID) \
 	--tempLocation=gs://$(TEMP_BUCKET)/ \
 	--gcpTempLocation=gs://$(TEMP_BUCKET)/$(TEMP_FOLDER) \
