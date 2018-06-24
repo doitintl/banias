@@ -29,21 +29,21 @@ All bucket names should contain only the name. No 'gs://' prefix.
 BigQuery allows you to specify a table's schema when you load data into a table, and when you create an empty table.  
 When you specify a table schema, you must supply each column's name and data type. You may optionally supply a column's description and mode.  
 You can find more information about schema and schema creation [here](https://cloud.google.com/bigquery/docs/schemas).  
-Banias utilize the standard schema format used by Google's BigQuery. You can find sample schemas can be found under the test folder. 
+Banias utilize the standard schema format used by Google's BigQuery. You can find sample schemas under the test folder. 
 
 ### Schemas Guidelines
 * Once the pipeline is started, it will look for the schemas to work on in the SCHEMAS_BUCKET.
 * The schema files are in a json format.
-* The file name (without the '.json') define the schema's key. It will be used to match the event with the schema.
+* The file name (without the '.json') defines the schema's key. It will be used to match the event with the schema.
 * The events will be mapped according to it's event_name + event_version --> schema key ('event_name'_'event_version' = schema key) 
 * If you want to add a new schema, just:
 	* Put the new json file in the bucket
-	* Restart your pipeline (It is recommended here to use a template)
+	* Restart your pipeline (it is recommended here to use a template)
 * Schema cannot be modified.
 
 ### Error table
 In the error table you will find all the elements that had issues (not having a schema is not an issue...).  
-The error table contains the the event type, content and the error that got this event to the error table.  
+The error table contains the the event type, content and the error that got this event into the error table.  
 
 ## Running
 ### Setup environment
