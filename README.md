@@ -2,8 +2,9 @@
 
 ![](banias-logo-lowres-trimmed.png)
 
-[![License](https://img.shields.io/github/license/doitintl/zorya.svg)](LICENSE) [![GitHub stars](https://img.shields.io/github/stars/doitintl/banias.svg?style=social&label=Stars&style=for-the-badge)](https://github.com/doitintl/banias) [![Build Status](https://secure.travis-ci.org/doitintl/banias.png?branch=master)](http://travis-ci.org/doitintl/banias)
+[![License](https://img.shields.io/github/license/doitintl/banias.svg)](LICENSE) [![GitHub stars](https://img.shields.io/github/stars/doitintl/banias.svg?style=social&label=Stars&style=for-the-badge)](https://github.com/doitintl/banias) [![Build Status](https://secure.travis-ci.org/doitintl/banias.png?branch=master)](http://travis-ci.org/doitintl/banias)
 
+[Blog Post](https://blog.doit-intl.com/say-goodbye-to-mixpanel-meet-banias-12e09fecc44a)
 
 Banias (Arabic: بانياس الحولة‎; Hebrew: בניאס‬) is the Arabic and modern Hebrew name of an ancient site developed around a river once associated with the Greek god [Pan](https://www.wikiwand.com/en/Pan_(mythology)).
 
