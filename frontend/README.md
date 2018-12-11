@@ -4,7 +4,7 @@
 * Setup a GKE cluster - `scripts/build_cluster.sh`
 * If you want to use Prometheus for monitoring, we recommend `https://github.com/camilb/prometheus-kubernetes`  
 * Build the images:
-	*`mkdir -p $GOPATH/src/github.com/doitintl/`
+	* `mkdir -p $GOPATH/src/github.com/doitintl/`
 	* `git clone git@github.com:doitintl/banias.git`
 	* `cd banias/frontend`
 	* `export PROJECT_ID=your_project_id`
