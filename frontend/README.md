@@ -3,7 +3,11 @@
 
 * Setup a GKE cluster - `scripts/build_cluster.sh`
 * If you want to use Prometheus for monitoring, we recommend `https://github.com/camilb/prometheus-kubernetes`  
-* Build the images
+* Build the images:
+	* `mkdir -p $GOPATH/src/github.com/doitintl/`
+	* `git clone git@github.com:doitintl/banias.git`
+	* `cd banias/frontend`
+	* `export PROJECT_ID=your_project_id`
 	* Install dependencies `https://github.com/golang/dep`
 	* Run `dep ensure`
 	* Build an deploy the image `scripts/dockerize.sh`
