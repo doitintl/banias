@@ -20,8 +20,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class BaniasPipeline {
 	private static final Logger LOG = LoggerFactory.getLogger(BaniasPipeline.class);
-	private static final TupleTag<TableRow> outputTag= new TupleTag<>();
-	private static final TupleTag<TableRow> errorsTag = new TupleTag<>();
+	private static final TupleTag<TableRow> outputTag= new TupleTag<TableRow>(){
+		private static final long serialVersionUID = 4585472024291962044L;
+	};
+	private static final TupleTag<TableRow> errorsTag = new TupleTag<TableRow>(){
+		private static final long serialVersionUID = -8629153140156879025L;
+	};
 
 	public static void main(String[] args){
 		ConcurrentHashMap<String,String> schemas;

@@ -10,28 +10,31 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <beam.version>2.9.0</beam.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <json.version>20180130</json.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-sdks-java-core</artifactId>
-            <version>2.4.0</version>
+            <version>${beam.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-direct-java</artifactId>
-            <version>2.4.0</version>
+            <version>${beam.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-runners-google-cloud-dataflow-java</artifactId>
-            <version>2.4.0</version>
+            <version>${beam.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.beam</groupId>
             <artifactId>beam-sdks-java-io-google-cloud-platform</artifactId>
-            <version>2.4.0</version>
+            <version>${beam.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>
@@ -51,12 +54,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180130</version>
+            <version>${json.version}</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
