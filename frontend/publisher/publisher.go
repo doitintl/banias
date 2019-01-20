@@ -10,6 +10,7 @@ import (
 	"github.com/doitintl/banias/frontend/types"
 	"github.com/henrylee2cn/goutil/pool"
 	"go.opencensus.io/stats"
+
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/tag"
 	"go.uber.org/zap"
@@ -28,18 +29,17 @@ func init() {
 			return new(gpubsub.Message)
 		},
 	}
-
 	successKey, _ = tag.NewKey("banias/keys/code")
-	publisherCounter, _ = stats.Float64("banias/measures/published_count", "Count of pub sub published messages", stats.UnitNone)
-	view.Subscribe(
+	publisherCounter = stats.Float64("banias/measures/published_count", "Count of pub sub published messages", "1")
+	view.Register(
 		&view.View{
 			Name:        "publish_count",
 			Description: "Count of pub sub published messages",
 			TagKeys:     []tag.Key{successKey},
 			Measure:     publisherCounter,
-			Aggregation: view.SumAggregation{},
+			Aggregation: view.Sum(),
 		})
-	view.SetReportingPeriod(1 * time.Second)
+	view.SetReportingPeriod(60 * time.Second)
 
 }
 
@@ -54,7 +54,7 @@ type Publisher struct {
 	client        *gpubsub.Client
 	wg            *sync.WaitGroup
 	id            int
-	collectorPool     *sync.Pool
+	collectorPool *sync.Pool
 }
 
 func GetClient(projectid string) (*gpubsub.Client, error) {
@@ -83,17 +83,17 @@ func createTopicIfNotExists(topic string, logger *zap.Logger, client *gpubsub.Cl
 
 func NewPublisher(logger *zap.Logger, bqEvents <-chan types.EventMsg, config *cfg.Config, collectorPool *sync.Pool, client *gpubsub.Client, id int) (*Publisher, error) {
 	logger.Debug("Creating a new publisher", zap.Int("id", id))
-	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount), config.MaxPubSubGoroutineIdleDuration * time.Second)
+	gp := pool.NewGoPool(int(config.MaxPubSubGoroutinesAmount), config.MaxPubSubGoroutineIdleDuration*time.Second)
 	topic, err := createTopicIfNotExists(config.Topic, logger, client)
 	logger.Debug("Done with topic")
 	p := Publisher{
-		bqEvents: bqEvents,
-		logger:   logger,
-		gp:       gp,
-		config:   config,
-		topic:    topic,
-		wg:       new(sync.WaitGroup),
-		id:       id,
+		bqEvents:      bqEvents,
+		logger:        logger,
+		gp:            gp,
+		config:        config,
+		topic:         topic,
+		wg:            new(sync.WaitGroup),
+		id:            id,
 		collectorPool: collectorPool,
 	}
 	if err != nil {
@@ -123,9 +123,9 @@ func (c *Publisher) Publish(messages []gpubsub.Message, t *time.Timer, maxDelay 
 			}
 		}
 		messages = nil
-		ocCtx, _ := tag.New(ctx, tag.Insert(successKey, "Success"), )
+		ocCtx, _ := tag.New(ctx, tag.Insert(successKey, "Success"))
 		stats.Record(ocCtx, publisherCounter.M(float64(total-errnum)))
-		ocCtx, _ = tag.New(ctx, tag.Insert(successKey, "Failures"), )
+		ocCtx, _ = tag.New(ctx, tag.Insert(successKey, "Failures"))
 		stats.Record(ocCtx, publisherCounter.M(float64(errnum)))
 		c.logger.Debug("Published ", zap.Int64("Success", total-errnum), zap.Int64("Failures", errnum))
 		t.Reset(maxDelay)

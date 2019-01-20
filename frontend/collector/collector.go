@@ -29,7 +29,7 @@ var (
 		[]string{"type", "event_name"},
 		[]string{"payload"},
 	}
-	DefaultLatencyDistribution = view.DistributionAggregation{0, 1, 2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25, 30, 40, 50, 65, 80, 100, 130, 160, 200, 250, 300, 400, 500, 650, 800, 1000, 2000, 5000, 10000, 20000, 50000, 100000}
+	DefaultLatencyDistribution = view.Distribution(0, 1, 2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 25, 30, 40, 50, 65, 80, 100, 130, 160, 200, 250, 300, 400, 500, 650, 800, 1000, 2000, 5000, 10000, 20000, 50000, 100000)
 	requestCounter             *stats.Float64Measure
 	requestlatency             *stats.Float64Measure
 	codeKey                    tag.Key
@@ -42,17 +42,17 @@ func init() {
 		},
 	}
 	codeKey, _ = tag.NewKey("banias/keys/code")
-	requestCounter, _ = stats.Float64("banias/measures/request_count", "Count of HTTP requests processed", stats.UnitNone)
-	requestlatency, _ = stats.Float64("banias/measures/request_latency", "Latency distribution of HTTP requests", stats.UnitMilliseconds)
-	view.Subscribe(
+	requestCounter= stats.Float64("banias/measures/request_count", "Count of HTTP requests processed", "1")
+	requestlatency = stats.Float64("banias/measures/request_latency", "Latency distribution of HTTP requests", "ms")
+	view.Register(
 		&view.View{
 			Name:        "request_count",
 			Description: "Count of HTTP requests processed",
 			TagKeys:     []tag.Key{codeKey},
 			Measure:     requestCounter,
-			Aggregation: view.CountAggregation{},
+			Aggregation: view.Count(),
 		})
-	view.Subscribe(
+	view.Register(
 		&view.View{
 			Name:        "request_latency",
 			Description: "Latency distribution of HTTP requests",
@@ -61,7 +61,7 @@ func init() {
 			Aggregation: DefaultLatencyDistribution,
 		})
 
-	view.SetReportingPeriod(1 * time.Second)
+	view.SetReportingPeriod(60 * time.Second)
 
 }
 

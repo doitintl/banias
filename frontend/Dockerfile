@@ -3,8 +3,7 @@ FROM golang:alpine AS build-env
 RUN apk update && apk upgrade && \
     apk add --no-cache  git
 ADD . /go/src/github.com/doitintl/banias/frontend
-RUN go get -u github.com/golang/dep/cmd/dep
-RUN cd /go/src/github.com/doitintl/banias/frontend && dep ensure && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -ldflags "-w -s" -o banias-frontend -tags netgo -installsuffix netgo .
+RUN cd /go/src/github.com/doitintl/banias/frontend &&  GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build  -ldflags "-w -s" -o banias-frontend -tags netgo -installsuffix netgo .
 
 ## final stage
 FROM alpine
