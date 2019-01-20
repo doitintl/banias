@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	cltr "github.com/doitintl/banias/frontend/collector"
 	cfg "github.com/doitintl/banias/frontend/config"
@@ -15,7 +16,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 	"go.opencensus.io/exporter/prometheus"
-	"go.opencensus.io/exporter/stackdriver"
+	"contrib.go.opencensus.io/exporter/stackdriver"
 	"go.opencensus.io/stats/view"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -49,16 +50,18 @@ func main() {
 	pExporter, err := prometheus.NewExporter(prometheus.Options{})
 	if err != nil {
 		logger.Error("Error creating prometheus exporter  ", zap.Error(err))
+	} else {
+		// Export to Prometheus Monitoring.
+		view.RegisterExporter(pExporter)
 	}
-	// Export to Prometheus Monitoring.
-	view.RegisterExporter(pExporter)
 	sExporter, err := stackdriver.NewExporter(stackdriver.Options{ProjectID: config.ProjectID})
 	if err != nil {
 		logger.Error("Error creating stackdriver exporter  ", zap.Error(err))
+	} else {
+		// Export to Stackdriver Monitoring.
+		view.RegisterExporter(sExporter)
+		view.SetReportingPeriod(60 * time.Second)
 	}
-	// Export to Stackdriver Monitoring.
-	view.RegisterExporter(sExporter)
-
 	collector, err = cltr.NewCollector(logger, config)
 	if err != nil {
 		logger.Fatal("Can't init Collector", zap.Error(err))

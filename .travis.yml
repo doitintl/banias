@@ -1,18 +1,13 @@
 language: go
 
 env:
-  - DEP_VERSION=0.4.1
+  - env GO111MODULE=on
 
 go:
-  - 1.9.3
-before_install:
-  # Download the binary to bin folder in $GOPATH
-  - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
-  # Make the binary executable
-  - chmod +x $GOPATH/bin/dep
+  - 1.11.4
 
 install:
-  -  cd frontend && $GOPATH/bin/dep ensure
+  -  cd frontend
 
 script: go build .
 
