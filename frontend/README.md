@@ -8,8 +8,6 @@
 	* `git clone git@github.com:doitintl/banias.git`
 	* `cd banias/frontend`
 	* `export PROJECT_ID=your_project_id`
-	* Install dependencies `https://github.com/golang/dep`
-	* Run `dep ensure`
 	* Build an deploy the image `scripts/dockerize.sh`
 * Create a service account with permission for Google Pub/Sub and Stackdiver.
 * Download the key file in JSON format
