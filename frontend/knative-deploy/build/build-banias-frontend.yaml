@@ -1,0 +1,17 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: Build
+metadata:
+  name: docker-build-banias-frontend
+spec:
+  serviceAccountName: knative-build
+  source:
+    git:
+      url: https://github.com/doitintl/banias.git
+      revision: avivl/knative
+  steps:
+  - name: build-and-push
+    image: gcr.io/kaniko-project/executor
+    args:
+    - --dockerfile=/workspace/frontend/Dockerfile
+    - --destination=gcr.io/aviv-playground/banias-frontend:latest
+    - --context=/workspace/frontend/
