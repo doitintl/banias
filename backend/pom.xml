@@ -12,7 +12,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <beam.version>2.9.0</beam.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <json.version>20180130</json.version>
+        <json.version>20230227</json.version>
     </properties>
     <dependencies>
         <dependency>
